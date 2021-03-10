@@ -13,24 +13,19 @@ from torch.autograd import Variable
 import time
 import classes
 import preprocessing
-<<<<<<< HEAD
 from preprocessing import read_files, prepare_data, zero_pad
-=======
 import config
->>>>>>> be7ef4f377832e13b0a77ca5decb9fb1ea605f97
 
 parser = argparse.ArgumentParser(description='PyTorch Get To The Point Training')
 parser.add_argument('--path', type=str, default=config.path,
                     help='path to the training data')
 
-<<<<<<< HEAD
+
 articles, summaries, dic = read_files(path)
-=======
 
 args = parser.parse_args()
 
 articles, summaries, dic = preprocessing.read_files(args.path)
->>>>>>> be7ef4f377832e13b0a77ca5decb9fb1ea605f97
 word_count = len(dic)
 print('Number of unique words:', word_count)
 
