@@ -25,9 +25,10 @@ parser.add_argument('--path', type=str, default=config.path,
 
 args = parser.parse_args()
 
-articles, summaries, dic = read_files(args.path)
+path = args.path
 
-articles, summaries, dic = read_files(args.path)
+articles, summaries, dic = read_files(path)
+
 word_count = len(dic)
 print('Number of unique words:', word_count)
 
