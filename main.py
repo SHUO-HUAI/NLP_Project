@@ -22,7 +22,7 @@ parser = argparse.ArgumentParser(description='PyTorch Get To The Point Training'
 parser.add_argument('--path', type=str, default=config.path,
                     help='path to the training data')
 
-
+# tttttttttttttsetafsdalj
 args = parser.parse_args()
 
 articles, summaries, dic = read_files(args.path)
