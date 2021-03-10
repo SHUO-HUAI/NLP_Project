@@ -73,16 +73,15 @@ def zero_pad(art_idx):
         if len(art) > longest:
             longest = len(art)
 
-<<<<<<< HEAD
+
   for art in art_idx:
     padded_article = np.zeros(longest, np.long)
     padded_article[:len(art)] = art
     padded_articles.append(padded_article)
-=======
+    
     for art in art_idx:
         padded_article = np.zeros(longest)
         padded_article[:len(art)] = art
         padded_articles.append(padded_article)
->>>>>>> be7ef4f377832e13b0a77ca5decb9fb1ea605f97
 
     return padded_articles
