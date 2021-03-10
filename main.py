@@ -21,9 +21,9 @@ parser.add_argument('--path', type=str, default=config.path,
                     help='path to the training data')
 
 
-articles, summaries, dic = read_files(path)
-
 args = parser.parse_args()
+
+articles, summaries, dic = read_files(args.path)
 
 articles, summaries, dic = preprocessing.read_files(args.path)
 word_count = len(dic)
