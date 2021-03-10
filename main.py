@@ -27,7 +27,6 @@ args = parser.parse_args()
 
 articles, summaries, dic = read_files(args.path)
 
-articles, summaries, dic = read_files(args.path)
 word_count = len(dic)
 print('Number of unique words:', word_count)
 
