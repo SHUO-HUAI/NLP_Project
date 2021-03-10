@@ -36,7 +36,7 @@ def read_files(path):
                         if line.rstrip():
                             article = article + line.rstrip() + ' '
                     else:
-                        if (line.rstrip()):
+                        if line.rstrip():
                             summary = summary + line.rstrip() + ' . '
                             flag = 0
 
@@ -70,7 +70,7 @@ def zero_pad(art_idx):
 
     # Length of longest article
     for art in art_idx:
-        if (len(art) > longest):
+        if len(art) > longest:
             longest = len(art)
 
     for art in art_idx:

@@ -1,3 +1,4 @@
+import argparse
 import os
 from os import listdir
 from os.path import isfile, join
@@ -12,9 +13,15 @@ from torch.autograd import Variable
 import time
 import classes
 import preprocessing
+import config
 
-path = './data'
+parser = argparse.ArgumentParser(description='PyTorch Get To The Point Training')
+parser.add_argument('--path', type=str, default=config.path,
+                    help='path to the training data')
 
-articles, summaries, dic = preprocessing.read_files(path)
+
+args = parser.parse_args()
+
+articles, summaries, dic = preprocessing.read_files(args.path)
 word_count = len(dic)
 print('Number of unique words:', word_count)
