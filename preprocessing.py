@@ -97,17 +97,14 @@ def get_unked(articles, dic):
   for article in articles:
 
     article_idx = []
-
     words = article.rstrip().split()
 
     for word in words:
 
       if word not in dic.word2idx:
-
           article_idx.append(dic.word2idx['<unk>'])
 
       else:
-
           article_idx.append(dic.word2idx[word])
 
     articles_idx.append(article_idx)
