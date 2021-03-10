@@ -4,6 +4,7 @@ from os.path import isfile, join
 from io import open
 import numpy as np
 import classes
+from classes import Dictionary
 
 
 # Given the path of the articles folder, return array of arrays of words (array of articles, where each article is an
@@ -11,7 +12,7 @@ import classes
 def read_files(path):
     onlyfiles = [f for f in listdir(path) if isfile(join(path, f))]
 
-    dic = classes.Dictionary()
+    dic = Dictionary()
 
     articles = []
     summaries = []

@@ -13,7 +13,9 @@ from torch.autograd import Variable
 import time
 import classes
 import preprocessing
+import model
 from preprocessing import read_files, prepare_data, zero_pad
+from model import Model
 import config
 
 parser = argparse.ArgumentParser(description='PyTorch Get To The Point Training')
@@ -25,7 +27,7 @@ args = parser.parse_args()
 
 articles, summaries, dic = read_files(args.path)
 
-articles, summaries, dic = preprocessing.read_files(args.path)
+articles, summaries, dic = read_files(args.path)
 word_count = len(dic)
 print('Number of unique words:', word_count)
 
@@ -40,3 +42,6 @@ print('Length of padded summaries:', len(padded_summaries[0]))
 
 tensor_art = torch.LongTensor(padded_articles)
 tensor_sum = torch.LongTensor(padded_summaries)
+
+model = Model(dic)
+model(tensor_art)
