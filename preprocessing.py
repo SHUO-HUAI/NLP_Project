@@ -79,7 +79,7 @@ def zero_pad(art_idx):
       longest = len(art)
 
   for art in art_idx:
-    padded_article = np.zeros(longest)
+    padded_article = np.zeros(longest, np.long)
     padded_article[:len(art)] = art
     padded_articles.append(padded_article)
 
