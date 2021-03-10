@@ -1,4 +1,6 @@
-# The dictionary contains the word <pad> at first position (index 0)
+# The dictionary contains:
+#<pad> (index 0)
+#<unk> (index 1)
 # Then we will add also the words <start>, <end>...
 
 class Dictionary(object):
@@ -6,7 +8,8 @@ class Dictionary(object):
         self.word2idx = {}
         self.idx2word = []
 
-        self.add_word('<pad>')
+        self.add_word('<pad>')#0
+        self.add_word('<unk>')#1
 
     def add_word(self, word):
         # word = word.lower()
