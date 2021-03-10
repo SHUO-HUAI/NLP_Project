@@ -45,3 +45,4 @@ tensor_sum = torch.LongTensor(padded_summaries)
 
 model = Model(dic)
 model(tensor_art)
+

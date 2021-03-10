@@ -82,3 +82,34 @@ def zero_pad(art_idx):
     
 
     return padded_articles
+    
+    
+    
+    
+
+
+#Given an article or a list of articles (in words, not indexes) returns the indexes of the words, and replaces new words with the index corresponding to '<unk>'
+
+def get_unked(articles, dic):
+
+  articles_idx = []
+
+  for article in articles:
+
+    article_idx = []
+
+    words = article.rstrip().split()
+
+    for word in words:
+
+      if word not in dic.word2idx:
+
+          article_idx.append(dic.word2idx['<unk>'])
+
+      else:
+
+          article_idx.append(dic.word2idx[word])
+
+    articles_idx.append(article_idx)
+
+  return articles_idx
