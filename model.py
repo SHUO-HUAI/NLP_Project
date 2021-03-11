@@ -30,9 +30,15 @@ class Model(nn.Module):
     self.Ws = nn.Linear(self.hidden_dim, self.hidden_dim) # for obtaining e from current state
     self.Wc = nn.Linear(self.art_len, self.hidden_dim) # for obtaining e from context vector
     self.v = nn.Linear(hidden_dim, 1) # for changing to scalar
+    
+    self.wh = nn.Linear(hidden_dim*2, 1) # for changing context vector into a scalar
+    self.ws = nn.Linear(hidden_dim, 1) # for changing hidden state into a scalar
+    self.wx = nn.Linear(emb_dim, 1) # for changing input embedding into a scalar
 
+    self.V1 = nn.Linear(hidden_dim*3, hidden_dim*3)
+    self.V2 = nn.Linear(hidden_dim*3, self.word_count)
 
-  def forward(self, inputs, target, Train=True):
+  def forward(self, inputs, target, train=True):
 
     input_len = inputs.size(-1)    # max input sequence length
     target_len = target.size(-1)  # max target sequence length
@@ -59,12 +65,14 @@ class Model(nn.Module):
     coverage = to_cuda(coverage)
     print('Coverage shape:',coverage.shape)
     
+    cov_loss = 0
+    
     next_input = to_cuda(target[:,0])       # First word of summary (should be <SOS>)
     #print(self.dictionary.idx2word[next_input])    # <SOS>
     
     out_list = []   # Output list
     
-    for i in range(2):#target_len - 1):
+    for i in range(target_len - 1):
     
         embedded_target = self.embed(next_input)    # size [b x emb_dim]
         
@@ -99,6 +107,43 @@ class Model(nn.Module):
         context = torch.bmm(attn.unsqueeze(1),encoded) # [b x 1 x in_seq] * [b x in_seq x hidden*2]
         context = context.squeeze() # [b x hidden*2] One array of [hidden*2] for each article
         
+        
+        # PROBABILITY OF GENERATING (one for each article, at each time step)
+        
+        # Depends on context vector, state of decoder, and input of decoder (embedded_target)
+        p_gen = torch.sigmoid(self.wh(context) + self.ws(state.squeeze()) + self.wx(embedded_target)) # [b]
+        
+        # Coverage loss (better pay attention on less covered words)
+        cov_loss += torch.sum(torch.min(attn,coverage))
+        
+        coverage += attn
+        
+        # Probability of vocabulary
+        # Concat context + state -> (hidden_dim*3]
+        
+        
+        cat = torch.cat([state.squeeze().view(batch_size,-1),context.view(batch_size,-1)],1)
+        v2_out = self.V2(self.V1(cat))
+        
+        p_vocab = F.softmax(v2_out, dim=1)    # Shape [b x vocab]
+        
+        
+        # ... PROBABILITY OF COPYING HERE ...
+        # ... PROBABILITY OF COPYING HERE ...
+        # ... PROBABILITY OF COPYING HERE ...
+        
+        
+        out = p_vocab.max(1)[1]   #.squeeze()
+        
+        out_list.append(out)
+        
+        if train:
+            next_input = to_cuda(target[:,i+1])
+            #print(self.dictionary.idx2word[next_input])
+            
+        else:
+            next_input = to_cuda(out)
+
         
     return
 
