@@ -129,7 +129,7 @@ pip-selfcheck.json
 .idea/mongoSettings.xml
 
 .idea/
-
+stanford-corenlp-4.2.0/
 ## File-based project format:
 *.iws
 
