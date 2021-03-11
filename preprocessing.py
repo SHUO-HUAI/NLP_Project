@@ -47,7 +47,7 @@ def read_files(path):
     return articles, summaries, dic
 
 
-# Given the articles (or summaries) strings and a dictionary, return the arrays of words converted to indexes
+# Given the articles strings and a dictionary, return the arrays of words converted to indexes
 def prepare_data(articles, dic):
     articles_idx = []
 
@@ -62,6 +62,26 @@ def prepare_data(articles, dic):
         articles_idx.append(article_idx)
 
     return articles_idx
+    
+    
+# Same as prepare_data but this is for summary so will add <SOS> at beginning and <EOS> at end
+def prepare_summary(summaries, dic):
+    summaries_idx = []
+
+    for summary in summaries:
+
+        summary_idx = []
+        summary_idx.append(dic.word2idx['<SOS>'])
+        words = summary.rstrip().split()
+
+        for word in words:
+            summary_idx.append(dic.word2idx[word])
+        
+        summary_idx.append(dic.word2idx['<EOS>'])
+
+        summaries_idx.append(summary_idx)
+
+    return summaries_idx
 
 
 # Pads the articles (or summaries) to the length of longest article (or summary)

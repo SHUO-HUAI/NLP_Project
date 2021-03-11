@@ -60,7 +60,7 @@ class Model(nn.Module):
     print('Coverage shape:',coverage.shape)
     
     next_input = to_cuda(target[:,0])       # First word of summary (should be <SOS>)
-    #print(self.dictionary.idx2word[next_input])
+    #print(self.dictionary.idx2word[next_input])    # <SOS>
     
     out_list = []   # Output list
     
@@ -94,5 +94,11 @@ class Model(nn.Module):
         attn = F.softmax(attn2.view(batch_size,input_len), dim=1) # Shape [b x input_len]
 
 
+        # CONTEXT VECTOR
+        
+        context = torch.bmm(attn.unsqueeze(1),encoded) # [b x 1 x in_seq] * [b x in_seq x hidden*2]
+        context = context.squeeze() # [b x hidden*2] One array of [hidden*2] for each article
+        
+        
     return
 

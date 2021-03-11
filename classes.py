@@ -8,8 +8,10 @@ class Dictionary(object):
         self.word2idx = {}
         self.idx2word = []
 
-        self.add_word('<pad>')#0
-        self.add_word('<unk>')#1
+        self.add_word('<PAD>')#0
+        self.add_word('<UNK>')#1
+        self.add_word('<SOS>')#2
+        self.add_word('<EOS>')#3
 
     def add_word(self, word):
         # word = word.lower()

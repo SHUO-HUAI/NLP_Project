@@ -14,7 +14,7 @@ import time
 import classes
 import preprocessing
 import model
-from preprocessing import read_files, prepare_data, zero_pad
+from preprocessing import read_files, prepare_data, prepare_summary, zero_pad
 from model import Model
 import config
 
@@ -32,7 +32,7 @@ word_count = len(dic)
 print('Number of unique words:', word_count)
 
 art_idx = prepare_data(articles, dic)
-sum_idx = prepare_data(summaries, dic)
+sum_idx = prepare_summary(summaries, dic)
 
 padded_articles = zero_pad(art_idx)
 padded_summaries = zero_pad(sum_idx)
