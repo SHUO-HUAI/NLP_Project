@@ -43,6 +43,8 @@ print('Length of padded summaries:', len(padded_summaries[0]))
 tensor_art = torch.LongTensor(padded_articles)
 tensor_sum = torch.LongTensor(padded_summaries)
 
-model = Model(dic)
-model(tensor_art)
+articles_len = len(tensor_art[0])
+
+model = Model(dic, articles_len)
+model(tensor_art[0], tensor_sum[0])
 
