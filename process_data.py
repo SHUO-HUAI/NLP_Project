@@ -9,6 +9,7 @@ import collections
 import tensorflow as tf
 from tensorflow.core.example import example_pb2
 
+# download and save in the root folder, ignored by gitignore due to large size
 os.environ['CLASSPATH'] = './stanford-corenlp-4.2.0/stanford-corenlp-4.2.0.jar'
 
 dm_single_close_quote = u'\u2019'  # unicode
