@@ -52,18 +52,18 @@ class Model(nn.Module):
     inputs = to_cuda(inputs)
     target = to_cuda(target)
 
-    print('Input shape:',inputs.shape)  # Size [b x input_len]
+    #print('Input shape:',inputs.shape)  # Size [b x input_len]
 
     embedded_inputs = self.embed(inputs)    # Size [b x input_len x emb_dim]
-    print('Embeddings shape:',embedded_inputs.shape)
+    #print('Embeddings shape:',embedded_inputs.shape)
 
     encoded, _ = self.encoder(embedded_inputs)  # Size [b x input_len x 2*hidden_dim]
-    print('Encoded shape:',encoded.shape)
+    #print('Encoded shape:',encoded.shape)
     
     coverage = np.zeros(inputs.shape,np.long)   # Coverage has size (b x seq_length)
     coverage = torch.Tensor(coverage)
     coverage = to_cuda(coverage)
-    print('Coverage shape:',coverage.shape)
+    #print('Coverage shape:',coverage.shape)
     
     cov_loss = 0
     
@@ -95,7 +95,7 @@ class Model(nn.Module):
         # Wh maps from hidden_dim*2 -> hidden_dim
         
         # attn1 shape [b*inputs_len x hidden_dim]
-        attn1 = self.Wh(encoded.contiguous().view(-1,encoded.size(2))) + self.Ws(state.squeeze()).repeat(input_len,1) + self.Wc(coverage).repeat(input_len,1)
+        attn1 = self.Wh(encoded.contiguous().view(-1,encoded.size(2))) + self.Ws(state.clone().squeeze()).repeat(input_len,1) + self.Wc(coverage.clone()).repeat(input_len,1)
         
         attn2 = self.v(attn1) # Shape [b*input_len x 1]
         
@@ -104,8 +104,8 @@ class Model(nn.Module):
 
         # CONTEXT VECTOR
         
-        context = torch.bmm(attn.unsqueeze(1),encoded) # [b x 1 x in_seq] * [b x in_seq x hidden*2]
-        context = context.squeeze() # [b x hidden*2] One array of [hidden*2] for each article
+        context2 = torch.bmm(attn.unsqueeze(1),encoded) # [b x 1 x in_seq] * [b x in_seq x hidden*2]
+        context = context2.squeeze() # [b x hidden*2] One array of [hidden*2] for each article
         
         
         # PROBABILITY OF GENERATING (one for each article, at each time step)
@@ -114,7 +114,7 @@ class Model(nn.Module):
         p_gen = torch.sigmoid(self.wh(context) + self.ws(state.squeeze()) + self.wx(embedded_target)) # [b]
         
         # Coverage loss (better pay attention on less covered words)
-        cov_loss += torch.sum(torch.min(attn,coverage))
+        cov_loss += torch.sum(torch.min(attn.clone(),coverage.clone()))
         
         coverage += attn
         
@@ -125,7 +125,7 @@ class Model(nn.Module):
         cat = torch.cat([state.squeeze().view(batch_size,-1),context.view(batch_size,-1)],1)
         v2_out = self.V2(self.V1(cat))
         
-        p_vocab = F.softmax(v2_out, dim=1)    # Shape [b x vocab]
+        p_vocab = F.softmax(v2_out, dim=1)   # Shape [b x vocab]
         
         
         # ... PROBABILITY OF COPYING HERE ...
@@ -133,9 +133,11 @@ class Model(nn.Module):
         # ... PROBABILITY OF COPYING HERE ...
         
         
-        out = p_vocab.max(1)[1]   #.squeeze()
+        out = p_vocab.max(1)[1]  #.squeeze()
         
-        out_list.append(out)
+        #out_list.append(out)
+        out_list.append(p_vocab)
+        
         
         if train:
             next_input = to_cuda(target[:,i+1])
@@ -144,6 +146,10 @@ class Model(nn.Module):
         else:
             next_input = to_cuda(out)
 
+
+    #print('Out_List:', out_list)
+    out_list = torch.stack(out_list,1)
+    #print('Out_List:', out_list)
         
-    return
+    return out_list, cov_loss
 

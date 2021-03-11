@@ -4,6 +4,7 @@ from os import listdir
 from os.path import isfile, join
 from io import open
 import torch
+from torch.nn.utils.rnn import pack_padded_sequence as pack
 import sys
 from torch import nn, optim
 import torch.nn.functional as F
@@ -14,6 +15,8 @@ import time
 import classes
 import preprocessing
 import model
+import functions
+from functions import to_cuda
 from preprocessing import read_files, prepare_data, prepare_summary, zero_pad
 from model import Model
 import config
@@ -46,5 +49,36 @@ tensor_sum = torch.LongTensor(padded_summaries)
 articles_len = len(tensor_art[0])
 
 model = Model(dic, articles_len)
-model(tensor_art[0], tensor_sum[0])
+model = to_cuda(model)
 
+
+# TEMPORARY CODE
+# TEMPORARY CODE
+# TEMPORARY CODE
+
+opt = optim.Adam(params=model.parameters(),lr=0.01)
+criterion = nn.NLLLoss()
+
+torch.autograd.set_detect_anomaly(True)
+
+for i in range(10):
+    print('Epoch:',i+1)
+    
+    opt.zero_grad()
+    
+    out_list, cov_loss = model(tensor_art, tensor_sum)
+    
+    loss = 0
+    for j in range(out_list.shape[0]):
+        loss += criterion(out_list[j],tensor_sum[j,1:])
+        
+    loss += cov_loss
+    
+    #loss = criterion(out_list,tensor_sum[:,1:])+cov_loss
+    print('Loss:',loss)
+    
+    loss.backward()
+    opt.step()
+    
+
+#model(tensor_art[0:3], tensor_sum[0:3])
