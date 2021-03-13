@@ -63,8 +63,8 @@ def prepare_data(articles, dic):
         articles_idx.append(article_idx)
 
     return articles_idx
-    
-    
+
+
 # Same as prepare_data but this is for summary so will add <SOS> at beginning and <EOS> at end
 def prepare_summary(summaries, dic):
     summaries_idx = []
@@ -77,7 +77,7 @@ def prepare_summary(summaries, dic):
 
         for word in words:
             summary_idx.append(dic.word2idx[word])
-        
+
         summary_idx.append(dic.word2idx['<EOS>'])
 
         summaries_idx.append(summary_idx)
@@ -95,48 +95,44 @@ def zero_pad(art_idx):
         if len(art) > longest:
             longest = len(art)
 
-
     for art in art_idx:
         padded_article = np.zeros(longest, np.long)
         padded_article[:len(art)] = art
         padded_articles.append(padded_article)
-    
 
     return padded_articles
-    
-    
+
+
 def remove_pad(art_idx):
-
     k = 0
-    
+
     for i in range(len(art_idx)):
-        
-        if(art_idx[i] != 0):
+
+        if art_idx[i] != 0:
             k += 1
-        
+
     return k
-    
 
 
-#Given an article or a list of articles (in words, not indexes) returns the indexes of the words, and replaces new words with the index corresponding to '<unk>'
+# Given an article or a list of articles (in words, not indexes) returns the indexes of the words, and replaces new
+# words with the index corresponding to '<unk>'
 
 def get_unked(articles, dic):
+    articles_idx = []
 
-  articles_idx = []
+    for article in articles:
 
-  for article in articles:
+        article_idx = []
+        words = article.rstrip().split()
 
-    article_idx = []
-    words = article.rstrip().split()
+        for word in words:
 
-    for word in words:
+            if word not in dic.word2idx:
+                article_idx.append(dic.word2idx['<unk>'])
 
-      if word not in dic.word2idx:
-          article_idx.append(dic.word2idx['<unk>'])
+            else:
+                article_idx.append(dic.word2idx[word])
 
-      else:
-          article_idx.append(dic.word2idx[word])
+        articles_idx.append(article_idx)
 
-    articles_idx.append(article_idx)
-
-  return articles_idx
+    return articles_idx

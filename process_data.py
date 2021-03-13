@@ -128,7 +128,8 @@ def get_art_abs(story_file):
     # Lowercase everything
     lines = [line.lower() for line in lines]
 
-    # Put periods on the ends of lines that are missing them (this is a problem in the dataset because many image captions don't end in periods; consequently they end up in the body of the article as run-on sentences)
+    # Put periods on the ends of lines that are missing them (this is a problem in the dataset because many image
+    # captions don't end in periods; consequently they end up in the body of the article as run-on sentences)
     lines = [fix_missing_period(line) for line in lines]
 
     # Separate out article and abstract sentences
@@ -155,7 +156,8 @@ def get_art_abs(story_file):
 
 
 def write_to_bin(url_file, out_file, makevocab=False):
-    """Reads the tokenized .story files corresponding to the urls listed in the url_file and writes them to a out_file."""
+    """Reads the tokenized .story files corresponding to the urls listed in the url_file and writes them to a
+    out_file. """
     print("Making bin file for URLs listed in %s..." % url_file)
     url_list = read_text_file(url_file)
     url_hashes = get_url_hashes(url_list)
@@ -178,7 +180,8 @@ def write_to_bin(url_file, out_file, makevocab=False):
                 story_file = os.path.join(dm_tokenized_stories_dir, s)
             else:
                 print(
-                    "Error: Couldn't find tokenized story file %s in either tokenized story directories %s and %s. Was there an error during tokenization?" % (
+                    "Error: Couldn't find tokenized story file %s in either tokenized story directories %s and %s. "
+                    "Was there an error during tokenization?" % (
                         s, cnn_tokenized_stories_dir, dm_tokenized_stories_dir))
                 # Check again if tokenized stories directories contain correct number of files
                 print("Checking that the tokenized stories directories %s and %s contain correct number of files..." % (
@@ -186,7 +189,8 @@ def write_to_bin(url_file, out_file, makevocab=False):
                 check_num_stories(cnn_tokenized_stories_dir, num_expected_cnn_stories)
                 check_num_stories(dm_tokenized_stories_dir, num_expected_dm_stories)
                 raise Exception(
-                    "Tokenized stories directories %s and %s contain correct number of files but story file %s found in neither." % (
+                    "Tokenized stories directories %s and %s contain correct number of files but story file %s found "
+                    "in neither." % (
                         cnn_tokenized_stories_dir, dm_tokenized_stories_dir, s))
 
             # Get the strings to write to .bin file

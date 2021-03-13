@@ -1,6 +1,6 @@
 # The dictionary contains:
-#<pad> (index 0)
-#<unk> (index 1)
+# <pad> (index 0)
+# <unk> (index 1)
 # Then we will add also the words <start>, <end>...
 
 class Dictionary(object):
@@ -8,10 +8,10 @@ class Dictionary(object):
         self.word2idx = {}
         self.idx2word = []
 
-        self.add_word('<PAD>')#0
-        self.add_word('<UNK>')#1
-        self.add_word('<SOS>')#2
-        self.add_word('<EOS>')#3
+        self.add_word('<PAD>')  # 0
+        self.add_word('<UNK>')  # 1
+        self.add_word('<SOS>')  # 2
+        self.add_word('<EOS>')  # 3
 
     def add_word(self, word):
         # word = word.lower()

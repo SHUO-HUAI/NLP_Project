@@ -51,49 +51,46 @@ articles_len = len(tensor_art[0])
 model = Model(dic, articles_len)
 model = to_cuda(model)
 
-
 # TEMPORARY CODE
 # TEMPORARY CODE
 # TEMPORARY CODE
 
-opt = optim.Adam(params=model.parameters(),lr=0.01)
+opt = optim.Adam(params=model.parameters(), lr=0.01)
 criterion = nn.NLLLoss()
 
 torch.autograd.set_detect_anomaly(True)
 
-
 for i in range(100):
-    print('Epoch:',i+1)
-    
+    print('Epoch:', i + 1)
+
     opt.zero_grad()
-    
+
     out_list, cov_loss = model(tensor_art, tensor_sum)
-    
+
     loss = 0
     for j in range(out_list.shape[0]):
-        #loss += criterion(out_list[j],tensor_sum[j,1:]) # '1:' Remove <SOS>
-        
-        k = remove_pad(tensor_sum[j,1:])
-        
-        loss += criterion(torch.log(out_list[j,:k-1]), tensor_sum[j,1:k])
-        
+        # loss += criterion(out_list[j],tensor_sum[j,1:]) # '1:' Remove <SOS>
+
+        k = remove_pad(tensor_sum[j, 1:])
+
+        loss += criterion(torch.log(out_list[j, :k - 1]), tensor_sum[j, 1:k])
+
     loss += cov_loss
-    
-    #PRINT
-    #out_string = []
-    #for word in out_list[j,:k-1]:
-    
+
+    # PRINT
+    # out_string = []
+    # for word in out_list[j,:k-1]:
+
     #    out_string.append(dic.idx2word[torch.argmax(word)])
     #    out_string.append(word)
-        
-    #print(out_string)
-    #PRINT
-    
-    #loss = criterion(out_list,tensor_sum[:,1:])+cov_loss
-    print('Loss:',loss)
-    
+
+    # print(out_string)
+    # PRINT
+
+    # loss = criterion(out_list,tensor_sum[:,1:])+cov_loss
+    print('Loss:', loss)
+
     loss.backward()
     opt.step()
-    
 
-#model(tensor_art[0:3], tensor_sum[0:3])
+# model(tensor_art[0:3], tensor_sum[0:3])
