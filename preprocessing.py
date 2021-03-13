@@ -5,45 +5,150 @@ from io import open
 import numpy as np
 import torch
 import classes
+import subprocess
 from classes import Dictionary
+
+# according to https://github.com/abisee/cnn-dailymail/blob/master/make_datafiles.py
+dm_single_close_quote = u'\u2019'  # unicode
+dm_double_close_quote = u'\u201d'
+SENTENCE_START = '<SOS>'
+SENTENCE_END = '<EOS>'
+END_TOKENS = ['.', '!', '?', '...', "'", "`", '"', dm_single_close_quote, dm_double_close_quote,
+              ")"]  #
+
+os.environ['CLASSPATH'] = './stanford-corenlp/stanford-corenlp-4.2.0.jar'
+
+
+def read_text_file(text_file):
+    lines = []
+    with open(text_file, "r") as f:
+        for line in f:
+            lines.append(line.strip())
+    return lines
+
+
+def fix_missing_period(line):
+    """Adds a period to a line that is missing a period"""
+    if "@highlight" in line: return line
+    if line == "": return line
+    if line[-1] in END_TOKENS: return line
+    return line + " ."
+
+
+def get_art_abs(story_file):
+    lines = read_text_file(story_file)
+
+    # Lowercase everything
+    lines = [line.lower() for line in lines]
+
+    # Put periods on the ends of lines that are missing them (this is a problem in the dataset because many image
+    # captions don't end in periods; consequently they end up in the body of the article as run-on sentences)
+    lines = [fix_missing_period(line) for line in lines]
+
+    # Separate out article and abstract sentences
+    article_lines = []
+    highlights = []
+    next_is_highlight = False
+    for idx, line in enumerate(lines):
+        if line == "":
+            continue  # empty line
+        elif line.startswith("@highlight"):
+            next_is_highlight = True
+        elif next_is_highlight:
+            highlights.append(line)
+        else:
+            article_lines.append(line)
+
+    # Make article into a single string
+    article = ' '.join(article_lines)
+
+    # Make abstract into a signle string, putting <s> and </s> tags around the sentences
+    abstract = ' '.join(["%s %s %s" % (SENTENCE_START, sent, SENTENCE_END) for sent in highlights])
+
+    return article, abstract
+
+
+def tokenize_stories(stories_dir, tokenized_stories_dir):
+    """Maps a whole directory of .story files to a tokenized version using Stanford CoreNLP Tokenizer"""
+    print("Preparing to tokenize %s to %s..." % (stories_dir, tokenized_stories_dir))
+    stories = os.listdir(stories_dir)
+    # make IO list file
+    print("Making list of files to tokenize...")
+    with open("mapping.txt", "w") as f:
+        for s in stories:
+            f.write("%s \t %s\n" % (os.path.join(stories_dir, s), os.path.join(tokenized_stories_dir, s)))
+    command = ['java', 'edu.stanford.nlp.process.PTBTokenizer', '-ioFileList', '-preserveLines', 'mapping.txt']
+    print("Tokenizing %i files in %s and saving in %s..." % (len(stories), stories_dir, tokenized_stories_dir))
+    subprocess.call(command)
+    print("Stanford CoreNLP Tokenizer has finished.")
+    os.remove("mapping.txt")
+
+    # Check that the tokenized stories directory contains the same number of files as the original directory
+    num_orig = len(os.listdir(stories_dir))
+    num_tokenized = len(os.listdir(tokenized_stories_dir))
+    if num_orig != num_tokenized:
+        raise Exception(
+            "The tokenized stories directory %s contains %i files, but it should contain the same number as %s (which "
+            "has %i files). Was there an error during tokenization?" % (
+                tokenized_stories_dir, num_tokenized, stories_dir, num_orig))
+    print("Successfully finished tokenizing %s to %s.\n" % (stories_dir, tokenized_stories_dir))
 
 
 # Given the path of the articles folder, return array of arrays of words (array of articles, where each article is an
 # array of words). Returns the array of articles, the array of summaries and the dictionary
-def read_files(path):
-    onlyfiles = [f for f in listdir(path) if isfile(join(path, f))]
+# def read_files(path):
+#     onlyfiles = [f for f in listdir(path) if isfile(join(path, f))]
+#     dic = Dictionary()
+#     articles = []
+#     summaries = []
+#     for f in onlyfiles:
+#         with open(join(path, f), 'r', encoding="utf8") as myfile:
+#             article = ''
+#             summary = ''
+#             flag = 0
+#             for line in myfile:
+#                 if '@highlight' in line:
+#                     flag = 1
+#                 else:
+#                     words = line.rstrip().split()  # + ['<eos>']
+#                     for word in words:
+#                         dic.add_word(word)
+#                     if flag == 0:
+#                         if line.rstrip():
+#                             article = article + line.rstrip() + ' '
+#                     else:
+#                         if line.rstrip():
+#                             summary = summary + line.rstrip() + ' . '
+#                             flag = 0
+#         articles.append(article)
+#         summaries.append(summary)
+#     return articles, summaries, dic
+
+def read_files(stories_path, tokenized_path):
+    need_token = not os.path.exists(tokenized_path)
+    if need_token:
+        os.mkdir(tokenized_path)
+        tokenize_stories(stories_path, tokenized_path)
 
     dic = Dictionary()
-
     articles = []
     summaries = []
-    for f in onlyfiles:
 
-        with open(join(path, f), 'r', encoding="utf8") as myfile:
-            article = ''
-            summary = ''
-            flag = 0
-            for line in myfile:
-
-                if '@highlight' in line:
-                    flag = 1
-
-                else:
-
-                    words = line.rstrip().split() + ['<eos>']
-                    for word in words:
-                        dic.add_word(word)
-
-                    if flag == 0:
-                        if line.rstrip():
-                            article = article + line.rstrip() + ' '
-                    else:
-                        if line.rstrip():
-                            summary = summary + line.rstrip() + ' . '
-                            flag = 0
-
+    stories = os.listdir(tokenized_path)
+    for story in stories:
+        article, abstract = get_art_abs(os.path.join(tokenized_path, story))
         articles.append(article)
-        summaries.append(summary)
+        summaries.append(abstract)
+
+        art_tokens = article.split(' ')
+        abs_tokens = abstract.split(' ')
+        abs_tokens = [t for t in abs_tokens if
+                      t not in [SENTENCE_START, SENTENCE_END]]  # remove these tags from vocab
+        tokens = art_tokens + abs_tokens
+        tokens = [t.strip() for t in tokens]  # strip
+        tokens = [t for t in tokens if t != ""]  # remove empty
+        for token in tokens:
+            dic.add_word(token)
 
     return articles, summaries, dic
 
@@ -51,37 +156,25 @@ def read_files(path):
 # Given the articles strings and a dictionary, return the arrays of words converted to indexes
 def prepare_data(articles, dic):
     articles_idx = []
-
     for article in articles:
-
         article_idx = []
         words = article.rstrip().split()
-
         for word in words:
             article_idx.append(dic.word2idx[word])
-
         articles_idx.append(article_idx)
-
     return articles_idx
 
 
 # Same as prepare_data but this is for summary so will add <SOS> at beginning and <EOS> at end
 def prepare_summary(summaries, dic):
     summaries_idx = []
-
     for summary in summaries:
-
-        summary_idx = []
-        summary_idx.append(dic.word2idx['<SOS>'])
+        summary_idx = [dic.word2idx['<SOS>']]
         words = summary.rstrip().split()
-
         for word in words:
             summary_idx.append(dic.word2idx[word])
-
         summary_idx.append(dic.word2idx['<EOS>'])
-
         summaries_idx.append(summary_idx)
-
     return summaries_idx
 
 
@@ -89,28 +182,22 @@ def prepare_summary(summaries, dic):
 def zero_pad(art_idx):
     longest = 0
     padded_articles = []
-
     # Length of longest article
     for art in art_idx:
         if len(art) > longest:
             longest = len(art)
-
     for art in art_idx:
         padded_article = np.zeros(longest, np.long)
         padded_article[:len(art)] = art
         padded_articles.append(padded_article)
-
     return padded_articles
 
 
 def remove_pad(art_idx):
     k = 0
-
     for i in range(len(art_idx)):
-
         if art_idx[i] != 0:
             k += 1
-
     return k
 
 
@@ -119,20 +206,13 @@ def remove_pad(art_idx):
 
 def get_unked(articles, dic):
     articles_idx = []
-
     for article in articles:
-
         article_idx = []
         words = article.rstrip().split()
-
         for word in words:
-
             if word not in dic.word2idx:
                 article_idx.append(dic.word2idx['<unk>'])
-
             else:
                 article_idx.append(dic.word2idx[word])
-
         articles_idx.append(article_idx)
-
     return articles_idx

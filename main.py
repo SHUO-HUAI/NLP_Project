@@ -22,15 +22,20 @@ from model import Model
 import config
 
 parser = argparse.ArgumentParser(description='PyTorch Get To The Point Training')
-parser.add_argument('--path', type=str, default=config.path,
+parser.add_argument('--path', type=str, default=config.stories_path,
+                    help='path to the training data')
+parser.add_argument('--token_path', type=str, default=config.tokenized_path,
                     help='path to the training data')
 
 args = parser.parse_args()
 
 path = args.path
+token_path = args.token_path
 
-articles, summaries, dic = read_files(path)
-
+articles, summaries, dic = read_files(path, token_path)
+# for i in dic.word2idx.keys():
+#     print(i, dic.word2idx[i])
+# exit()
 word_count = len(dic)
 print('Number of unique words:', word_count)
 
@@ -67,7 +72,8 @@ for i in range(100):
 
     out_list, cov_loss = model(tensor_art, tensor_sum)
 
-    loss = 0
+    loss = torch.tensor(0.)
+    loss = to_cuda(loss)
     for j in range(out_list.shape[0]):
         # loss += criterion(out_list[j],tensor_sum[j,1:]) # '1:' Remove <SOS>
 
@@ -78,13 +84,11 @@ for i in range(100):
     loss += cov_loss
 
     # PRINT
-    # out_string = []
-    # for word in out_list[j,:k-1]:
+    out_string = []
+    for word in out_list[j, :k - 1]:
+        out_string.append(dic.idx2word[torch.argmax(word)])
 
-    #    out_string.append(dic.idx2word[torch.argmax(word)])
-    #    out_string.append(word)
-
-    # print(out_string)
+    print(out_string)
     # PRINT
 
     # loss = criterion(out_list,tensor_sum[:,1:])+cov_loss
