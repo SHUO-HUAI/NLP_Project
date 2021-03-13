@@ -3,6 +3,7 @@ from os import listdir
 from os.path import isfile, join
 from io import open
 import numpy as np
+import torch
 import classes
 from classes import Dictionary
 
@@ -104,7 +105,16 @@ def zero_pad(art_idx):
     return padded_articles
     
     
+def remove_pad(art_idx):
+
+    k = 0
     
+    for i in range(len(art_idx)):
+        
+        if(art_idx[i] != 0):
+            k += 1
+        
+    return k
     
 
 

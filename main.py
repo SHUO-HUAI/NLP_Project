@@ -17,7 +17,7 @@ import preprocessing
 import model
 import functions
 from functions import to_cuda
-from preprocessing import read_files, prepare_data, prepare_summary, zero_pad
+from preprocessing import read_files, prepare_data, prepare_summary, zero_pad, remove_pad
 from model import Model
 import config
 
@@ -61,7 +61,8 @@ criterion = nn.NLLLoss()
 
 torch.autograd.set_detect_anomaly(True)
 
-for i in range(10):
+
+for i in range(100):
     print('Epoch:',i+1)
     
     opt.zero_grad()
@@ -70,9 +71,23 @@ for i in range(10):
     
     loss = 0
     for j in range(out_list.shape[0]):
-        loss += criterion(out_list[j],tensor_sum[j,1:])
+        #loss += criterion(out_list[j],tensor_sum[j,1:]) # '1:' Remove <SOS>
+        
+        k = remove_pad(tensor_sum[j,1:])
+        
+        loss += criterion(torch.log(out_list[j,:k-1]), tensor_sum[j,1:k])
         
     loss += cov_loss
+    
+    #PRINT
+    #out_string = []
+    #for word in out_list[j,:k-1]:
+    
+    #    out_string.append(dic.idx2word[torch.argmax(word)])
+    #    out_string.append(word)
+        
+    #print(out_string)
+    #PRINT
     
     #loss = criterion(out_list,tensor_sum[:,1:])+cov_loss
     print('Loss:',loss)
