@@ -42,8 +42,7 @@ class Model(nn.Module):
         input_len = inputs.size(-1)  # max input sequence length
         target_len = target.size(-1)  # max target sequence length
 
-        inputs = inputs.view(-1,
-                             input_len)
+        inputs = inputs.view(-1, input_len)
         # If I pass only 1 article and 1 summary I add one dimension at the
         # beginning (useful for test)
         target = target.view(-1, target_len)
@@ -96,7 +95,7 @@ class Model(nn.Module):
 
             # attn1 shape [b*inputs_len x hidden_dim]
             attn1 = self.Wh(encoded.contiguous().view(-1, encoded.size(2))) + self.Ws(state.clone().squeeze()).repeat(
-                input_len, 1) + self.Wc(coverage.clone()).repeat(input_len, 1)
+                input_len, 1)
 
             attn2 = self.v(attn1)  # Shape [b*input_len x 1]
 
@@ -111,7 +110,7 @@ class Model(nn.Module):
 
             # Depends on context vector, state of decoder, and input of decoder (embedded_target)
             p_gen = torch.sigmoid(self.wh(context) + self.ws(state.squeeze()) + self.wx(embedded_target))  # [b]
-
+    
             # Coverage loss (better pay attention on less covered words)
             cov_loss += torch.sum(torch.min(attn.clone(), coverage.clone()))
 
@@ -124,11 +123,46 @@ class Model(nn.Module):
             v2_out = self.V2(self.V1(cat))
 
             p_vocab = F.softmax(v2_out, dim=1)  # Shape [b x vocab]
-
+            p_vocab = v2_out
+            
+            #print(attn.shape)
+            #print(p_vocab.shape)
+            
+            
             # ... PROBABILITY OF COPYING HERE ...
             # ... PROBABILITY OF COPYING HERE ...
+            
+            p_copy = torch.tensor(1) - p_gen[0][0]  # p_gen has shape [1,1] so doing [0][0] we get the raw number
+            p_oov = []
+  
+            
+            for b in range(inputs.shape[0]):
+                attn_idx = 0
+                for word in inputs[b]:
+                    #print(word)
+                    if word.item() in self.dictionary.word2idx.values():
+                        #print(p_vocab[b][word.item()])
+                        p_vocab[b][word.item()] += p_copy*attn[b][attn_idx]
+                        #print(p_vocab[b][word.item()])
+                        #pass
+                    else:
+                        #print(word.item())
+                        #print(self.dictionary.idx2word[word.item()])
+                        #p_oov.append(p_copy*attn[b][attn_idx])
+                        pass
+                        
+                    attn_idx += 1
+                    
+            p_vocab += 1/self.word_count
+            p_vocab = F.softmax(p_vocab, dim=1)
+    
+            #print(p_oov)
+            #time.sleep(10)
+    
             # ... PROBABILITY OF COPYING HERE ...
-
+            # ... PROBABILITY OF COPYING HERE ...
+            
+            
             out = p_vocab.max(1)[1]  # .squeeze()
 
             # out_list.append(out)

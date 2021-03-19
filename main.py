@@ -33,9 +33,9 @@ path = args.path
 token_path = args.token_path
 
 articles, summaries, dic = read_files(path, token_path)
-# for i in dic.word2idx.keys():
-#     print(i, dic.word2idx[i])
-# exit()
+#for i in dic.word2idx.keys():
+#    print(i, dic.word2idx[i])
+#exit()
 word_count = len(dic)
 print('Number of unique words:', word_count)
 
@@ -52,6 +52,7 @@ tensor_art = torch.LongTensor(padded_articles)
 tensor_sum = torch.LongTensor(padded_summaries)
 
 articles_len = len(tensor_art[0])
+
 
 model = Model(dic, articles_len)
 model = to_cuda(model)
@@ -70,7 +71,7 @@ for i in range(100):
 
     opt.zero_grad()
 
-    out_list, cov_loss = model(tensor_art, tensor_sum)
+    out_list, cov_loss = model(tensor_art[0], tensor_sum[0])
 
     loss = torch.tensor(0.)
     loss = to_cuda(loss)
@@ -79,9 +80,9 @@ for i in range(100):
 
         k = remove_pad(tensor_sum[j, 1:])
 
-        loss += criterion(torch.log(out_list[j, :k - 1]), tensor_sum[j, 1:k])
+        loss += criterion(torch.log(out_list[j, :k - 1]), tensor_sum[j, 1:k]) 
 
-    loss += cov_loss
+    #loss += cov_loss
 
     # PRINT
     out_string = []
