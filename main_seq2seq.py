@@ -18,7 +18,7 @@ import model
 import functions
 from functions import to_cuda
 from preprocessing import read_files, prepare_data, prepare_summary, zero_pad, remove_pad
-from model_seq2seq import Model
+from model_all import Model
 import config
 
 parser = argparse.ArgumentParser(description='PyTorch Get To The Point Training')

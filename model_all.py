@@ -78,7 +78,7 @@ class Model(nn.Module):
             # 1 is the sequence length for the LSTM
 
             if i == 0:
-                state, C = self.decoder(embedded_target.unsqueeze(1)) #s
+                state, C = self.decoder(embedded_target.unsqueeze(1))  # s
             else:
                 state, C = self.decoder(embedded_target.unsqueeze(1), C)
 
@@ -107,7 +107,6 @@ class Model(nn.Module):
             # PROBABILITY OF GENERATING (one for each article, at each time step)
 
             # Depends on context vector, state of decoder, and input of decoder (embedded_target)
-            # p_gen = torch.sigmoid(self.wh(context) + self.ws(state.squeeze()) + self.wx(embedded_target))  # [b]
 
             # Probability of vocabulary
             # Concat context + state -> (hidden_dim*3]
@@ -118,9 +117,13 @@ class Model(nn.Module):
 
             p_vocab = F.softmax(v2_out, dim=1)  # Shape [b x vocab]
 
-            # ... PROBABILITY OF COPYING HERE ...
-            # ... PROBABILITY OF COPYING HERE ...
-            # ... PROBABILITY OF COPYING HERE ...
+            p_gen = torch.sigmoid(self.wh(context) + self.ws(state.squeeze()) + self.wx(embedded_target))  # [b]
+
+            print(p_gen.shape)
+            print(p_vocab.shape)
+
+            exit()
+
 
             out = p_vocab.max(1)[1]  # .squeeze()
 
