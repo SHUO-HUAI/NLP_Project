@@ -119,11 +119,42 @@ class Model(nn.Module):
 
             p_gen = torch.sigmoid(self.wh(context) + self.ws(state.squeeze()) + self.wx(embedded_target))  # [b]
 
-            print(p_gen.shape)
-            print(p_vocab.shape)
+            p_copy = torch.ones((p_gen.size(0), 1)) - p_gen
 
-            exit()
+            # print(p_gen.shape)
+            # print(p_vocab.shape)
 
+            # print(p_gen)
+            # print(p_copy)
+
+            # print(inputs.max())
+
+            p_len = max(inputs.max(), p_vocab.size(1))
+            # print(p_len)
+
+            # print(inputs[0][0])
+
+            p_w = torch.zeros((p_gen.size(0), p_len))
+
+            p_gen = p_gen.view(-1)
+            p_copy = p_copy.view(-1)
+            # print(p_gen)
+
+            for ind_tmp in range(p_len):
+                # print(inputs == ind_tmp)
+                # exit()
+                if ind_tmp < p_vocab.size(1):
+                    # print(p_gen)
+                    # print((p_gen * p_vocab[:, ind_tmp]).shape)
+                    # print((attn * (inputs == ind_tmp)).shape)
+                    # print(((attn * (inputs == ind_tmp)).sum(1)))
+                    p_w[:, ind_tmp] = p_gen * p_vocab[:, ind_tmp] + p_copy * ((attn * (inputs == ind_tmp)).sum(1))
+                else:
+                    p_w[:, ind_tmp] = p_copy * ((attn * (inputs == ind_tmp)).sum(1))
+
+            # exit()
+
+            p_vocab = p_w
 
             out = p_vocab.max(1)[1]  # .squeeze()
 
