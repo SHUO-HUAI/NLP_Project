@@ -156,6 +156,8 @@ class Model(nn.Module):
 
             p_vocab = p_w
 
+            p_vocab += 1 / self.word_count
+
             out = p_vocab.max(1)[1]  # .squeeze()
 
             # out_list.append(out)
