@@ -78,7 +78,7 @@ class Model(nn.Module):
             # 1 is the sequence length for the LSTM
 
             if i == 0:
-                state, C = self.decoder(embedded_target.unsqueeze(1)) #s
+                state, C = self.decoder(embedded_target.unsqueeze(1))  # s
             else:
                 state, C = self.decoder(embedded_target.unsqueeze(1), C)
 
@@ -107,7 +107,6 @@ class Model(nn.Module):
             # PROBABILITY OF GENERATING (one for each article, at each time step)
 
             # Depends on context vector, state of decoder, and input of decoder (embedded_target)
-            # p_gen = torch.sigmoid(self.wh(context) + self.ws(state.squeeze()) + self.wx(embedded_target))  # [b]
 
             # Probability of vocabulary
             # Concat context + state -> (hidden_dim*3]
@@ -118,9 +117,46 @@ class Model(nn.Module):
 
             p_vocab = F.softmax(v2_out, dim=1)  # Shape [b x vocab]
 
-            # ... PROBABILITY OF COPYING HERE ...
-            # ... PROBABILITY OF COPYING HERE ...
-            # ... PROBABILITY OF COPYING HERE ...
+            p_gen = torch.sigmoid(self.wh(context) + self.ws(state.squeeze()) + self.wx(embedded_target))  # [b]
+
+            p_copy = torch.ones((p_gen.size(0), 1)) - p_gen
+
+            # print(p_gen.shape)
+            # print(p_vocab.shape)
+
+            # print(p_gen)
+            # print(p_copy)
+
+            # print(inputs.max())
+
+            p_len = max(inputs.max(), p_vocab.size(1))
+            # print(p_len)
+
+            # print(inputs[0][0])
+
+            p_w = torch.zeros((p_gen.size(0), p_len))
+
+            p_gen = p_gen.view(-1)
+            p_copy = p_copy.view(-1)
+            # print(p_gen)
+
+            for ind_tmp in range(p_len):
+                # print(inputs == ind_tmp)
+                # exit()
+                if ind_tmp < p_vocab.size(1):
+                    # print(p_gen)
+                    # print((p_gen * p_vocab[:, ind_tmp]).shape)
+                    # print((attn * (inputs == ind_tmp)).shape)
+                    # print(((attn * (inputs == ind_tmp)).sum(1)))
+                    p_w[:, ind_tmp] = p_gen * p_vocab[:, ind_tmp] + p_copy * ((attn * (inputs == ind_tmp)).sum(1))
+                else:
+                    p_w[:, ind_tmp] = p_copy * ((attn * (inputs == ind_tmp)).sum(1))
+
+            # exit()
+
+            p_vocab = p_w
+
+            p_vocab += 1 / self.word_count
 
             out = p_vocab.max(1)[1]  # .squeeze()
 
