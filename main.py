@@ -39,7 +39,7 @@ articles, summaries, dic = read_files(path, token_path)
 word_count = len(dic)
 print('Number of unique words:', word_count)
 
-art_idx = prepare_data(articles, dic)
+art_idx = prepare_data(articles[0], dic)
 sum_idx = prepare_summary(summaries, dic)
 
 padded_articles = zero_pad(art_idx)

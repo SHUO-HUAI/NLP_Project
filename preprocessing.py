@@ -67,7 +67,6 @@ def get_art_abs(story_file):
 
     return article, abstract
 
-
 def tokenize_stories(stories_dir, tokenized_stories_dir):
     """Maps a whole directory of .story files to a tokenized version using Stanford CoreNLP Tokenizer"""
     print("Preparing to tokenize %s to %s..." % (stories_dir, tokenized_stories_dir))
@@ -159,8 +158,17 @@ def prepare_data(articles, dic):
     for article in articles:
         article_idx = []
         words = article.rstrip().split()
+        
+        oov_idx = len(dic.idx2word)
+        
         for word in words:
-            article_idx.append(dic.word2idx[word])
+        
+            if word in dic.word2idx.keys():
+                article_idx.append(dic.word2idx[word])
+            else:
+                article_idx.append(oov_idx)
+                oov_idx += 1
+                
         articles_idx.append(article_idx)
     return articles_idx
 
