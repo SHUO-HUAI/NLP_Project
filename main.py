@@ -39,7 +39,7 @@ articles, summaries, dic = read_files(path, token_path)
 word_count = len(dic)
 print('Number of unique words:', word_count)
 
-art_idx = prepare_data(articles[0], dic)
+art_idx = prepare_data(articles, dic)
 sum_idx = prepare_summary(summaries, dic)
 
 padded_articles = zero_pad(art_idx)
@@ -72,6 +72,8 @@ for i in range(100):
     opt.zero_grad()
 
     out_list, cov_loss = model(tensor_art[0], tensor_sum[0])
+
+    #print(len(out_list[0][0]))
 
     loss = torch.tensor(0.)
     loss = to_cuda(loss)

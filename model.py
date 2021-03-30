@@ -12,7 +12,7 @@ from functions import to_cuda
 
 class Model(nn.Module):
 
-    def __init__(self, dic, art_len, emb_dim=128, hidden_dim=256):
+    def __init__(self, dic, art_len, emb_dim=128, hidden_dim=256, max_oovs=100):
         super(Model, self).__init__()
 
         self.emb_dim = emb_dim  # Word embedding dimension
@@ -20,6 +20,7 @@ class Model(nn.Module):
         self.word_count = len(dic.word2idx)  # Vocabulary size
         self.art_len = art_len
         self.dictionary = dic  # Saving the dictionary
+        self.max_oovs = max_oovs
 
         self.embed = nn.Embedding(self.word_count, self.emb_dim)
         self.encoder = nn.LSTM(input_size=self.emb_dim, hidden_size=hidden_dim, batch_first=True, bidirectional=True)
@@ -126,8 +127,11 @@ class Model(nn.Module):
             p_vocab = v2_out
             
             #print(attn.shape)
-            #print(p_vocab.shape)
             
+            p_expanded_vocab = torch.zeros([batch_size,self.word_count + self.max_oovs])
+            p_expanded_vocab[:,:self.word_count] = p_vocab
+            p_expanded_vocab += 1/self.word_count
+            #print(p_expanded_vocab)
             
             # ... PROBABILITY OF COPYING HERE ...
             # ... PROBABILITY OF COPYING HERE ...
@@ -139,22 +143,14 @@ class Model(nn.Module):
             for b in range(inputs.shape[0]):
                 attn_idx = 0
                 for word in inputs[b]:
-                    #print(word)
-                    if word.item() in self.dictionary.word2idx.values():
-                        #print(p_vocab[b][word.item()])
-                        p_vocab[b][word.item()] += p_copy*attn[b][attn_idx]
-                        #print(p_vocab[b][word.item()])
-                        #pass
-                    else:
-                        #print(word.item())
-                        #print(self.dictionary.idx2word[word.item()])
-                        #p_oov.append(p_copy*attn[b][attn_idx])
-                        pass
+                
+                    p_expanded_vocab[b][word.item()] += p_copy*attn[b][attn_idx]
                         
                     attn_idx += 1
                     
-            p_vocab += 1/self.word_count
-            p_vocab = F.softmax(p_vocab, dim=1)
+            
+            #p_vocab += 1/self.word_count
+            p_expanded_vocab = F.softmax(p_expanded_vocab, dim=1)
     
             #print(p_oov)
             #time.sleep(10)
@@ -163,10 +159,12 @@ class Model(nn.Module):
             # ... PROBABILITY OF COPYING HERE ...
             
             
-            out = p_vocab.max(1)[1]  # .squeeze()
+            out = p_expanded_vocab.max(1)[1]  # .squeeze()
 
             # out_list.append(out)
-            out_list.append(p_vocab)
+            out_list.append(p_expanded_vocab)
+            #print(p_expanded_vocab.shape)
+            #time.sleep(10)
 
             if train:
                 next_input = to_cuda(target[:, i + 1])

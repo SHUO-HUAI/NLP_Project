@@ -67,6 +67,7 @@ def get_art_abs(story_file):
 
     return article, abstract
 
+
 def tokenize_stories(stories_dir, tokenized_stories_dir):
     """Maps a whole directory of .story files to a tokenized version using Stanford CoreNLP Tokenizer"""
     print("Preparing to tokenize %s to %s..." % (stories_dir, tokenized_stories_dir))
@@ -171,7 +172,6 @@ def prepare_data(articles, dic):
                 
         articles_idx.append(article_idx)
     return articles_idx
-
 
 # Same as prepare_data but this is for summary so will add <SOS> at beginning and <EOS> at end
 def prepare_summary(summaries, dic):
