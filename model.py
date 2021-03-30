@@ -7,6 +7,8 @@ from torch.autograd import Variable
 import time
 import classes
 import functions
+import preprocessing
+from preprocessing import get_unked
 from functions import to_cuda
 
 
@@ -47,15 +49,18 @@ class Model(nn.Module):
         # If I pass only 1 article and 1 summary I add one dimension at the
         # beginning (useful for test)
         target = target.view(-1, target_len)
+        
+        unked_inputs = get_unked(inputs, self.dictionary)
 
         batch_size = inputs.size(0)
 
         inputs = to_cuda(inputs)
+        unked_inputs = to_cuda(unked_inputs)
         target = to_cuda(target)
 
         # print('Input shape:',inputs.shape)  # Size [b x input_len]
 
-        embedded_inputs = self.embed(inputs)  # Size [b x input_len x emb_dim]
+        embedded_inputs = self.embed(unked_inputs)  # Size [b x input_len x emb_dim]
         # print('Embeddings shape:',embedded_inputs.shape)
 
         encoded, _ = self.encoder(embedded_inputs)  # Size [b x input_len x 2*hidden_dim]
@@ -68,11 +73,15 @@ class Model(nn.Module):
 
         cov_loss = 0
 
-        next_input = to_cuda(target[:, 0])  # First word of summary (should be <SOS>)
-        # print(self.dictionary.idx2word[next_input])    # <SOS>
+        if train:
+            next_input = to_cuda(target[:, 0])  # First word of summary (should be <SOS>)
+        
+        else:
+            next_input = self.dictionary.word2idx['<SOS>']
+        
 
         out_list = []  # Output list
-
+x
         for i in range(target_len - 1):
 
             embedded_target = self.embed(next_input)  # size [b x emb_dim]

@@ -17,7 +17,7 @@ import preprocessing
 import model
 import functions
 from functions import to_cuda
-from preprocessing import read_files, prepare_data, prepare_summary, zero_pad, remove_pad
+from preprocessing import read_files, prepare_data, prepare_summary, zero_pad, remove_pad, get_unked
 from model import Model
 import config
 
@@ -41,6 +41,13 @@ print('Number of unique words:', word_count)
 
 art_idx = prepare_data(articles, dic)
 sum_idx = prepare_summary(summaries, dic)
+
+
+#hello = prepare_data(['my name is pasquale'], dic)
+#unked_hello = get_unked(hello, dic)
+#print(hello)
+#print(unked_hello)
+#exit()
 
 padded_articles = zero_pad(art_idx)
 padded_summaries = zero_pad(sum_idx)
