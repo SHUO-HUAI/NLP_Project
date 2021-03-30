@@ -81,7 +81,7 @@ class Model(nn.Module):
         
 
         out_list = []  # Output list
-x
+        
         for i in range(target_len - 1):
 
             embedded_target = self.embed(next_input)  # size [b x emb_dim]
@@ -133,33 +133,41 @@ x
             v2_out = self.V2(self.V1(cat))
 
             p_vocab = F.softmax(v2_out, dim=1)  # Shape [b x vocab]
-            p_vocab = v2_out
+            #p_vocab = v2_out
             
             #print(attn.shape)
             
+            # ... PROBABILITY OF COPYING HERE ...
+            # ... PROBABILITY OF COPYING HERE ...
+            
+            p_gen = p_gen.view(-1)[0]
+            p_copy = torch.tensor(1) - p_gen  # p_gen has shape [1,1] so doing [0][0] we get the raw number
+            
+            p_oov = []
+            
+            
             p_expanded_vocab = torch.zeros([batch_size,self.word_count + self.max_oovs])
-            p_expanded_vocab[:,:self.word_count] = p_vocab
+            p_expanded_vocab[:,:self.word_count] = p_vocab*p_gen
             p_expanded_vocab += 1/self.word_count
             #print(p_expanded_vocab)
-            
-            # ... PROBABILITY OF COPYING HERE ...
-            # ... PROBABILITY OF COPYING HERE ...
-            
-            p_copy = torch.tensor(1) - p_gen[0][0]  # p_gen has shape [1,1] so doing [0][0] we get the raw number
-            p_oov = []
   
             
             for b in range(inputs.shape[0]):
                 attn_idx = 0
                 for word in inputs[b]:
                 
+                    #if word in self.dictionary.word2idx.values():
                     p_expanded_vocab[b][word.item()] += p_copy*attn[b][attn_idx]
+                        
+                    #else:
+                        #p_expanded_vocab[b][word.item()] += p_gen*attn[b][attn_idx]
+                        #pass
                         
                     attn_idx += 1
                     
             
             #p_vocab += 1/self.word_count
-            p_expanded_vocab = F.softmax(p_expanded_vocab, dim=1)
+            #p_expanded_vocab = F.softmax(p_expanded_vocab, dim=1)
     
             #print(p_oov)
             #time.sleep(10)
