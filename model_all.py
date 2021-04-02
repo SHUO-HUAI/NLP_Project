@@ -8,6 +8,7 @@ import time
 import classes
 import functions
 from functions import to_cuda
+from preprocessing import get_unked
 
 
 class Model(nn.Module):
@@ -50,12 +51,16 @@ class Model(nn.Module):
 
         batch_size = inputs.size(0)
 
+        unked_inputs = get_unked(inputs, self.dictionary)
+
         inputs = to_cuda(inputs)
         target = to_cuda(target)
+        unked_inputs = to_cuda(unked_inputs)
+
 
         # print('Input shape:',inputs.shape)  # Size [b x input_len]
 
-        embedded_inputs = self.embed(inputs)  # Size [b x input_len x emb_dim]
+        embedded_inputs = self.embed(unked_inputs)  # Size [b x input_len x emb_dim]
         # print('Embeddings shape:',embedded_inputs.shape)
 
         encoded, _ = self.encoder(embedded_inputs)  # Size [b x input_len x 2*hidden_dim] hi

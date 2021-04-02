@@ -159,19 +159,20 @@ def prepare_data(articles, dic):
     for article in articles:
         article_idx = []
         words = article.rstrip().split()
-        
+
         oov_idx = len(dic.idx2word)
-        
+
         for word in words:
-        
+
             if word in dic.word2idx.keys():
                 article_idx.append(dic.word2idx[word])
             else:
                 article_idx.append(oov_idx)
                 oov_idx += 1
-                
+
         articles_idx.append(article_idx)
     return articles_idx
+
 
 # Same as prepare_data but this is for summary so will add <SOS> at beginning and <EOS> at end
 def prepare_summary(summaries, dic):
@@ -207,7 +208,6 @@ def remove_pad(art_idx):
         if art_idx[i] != 0:
             k += 1
     return k
-
 
 
 def get_unked(articles, dic):
