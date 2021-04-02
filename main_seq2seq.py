@@ -70,18 +70,24 @@ for i in range(100):
 
     opt.zero_grad()
 
-    out_list = model(tensor_art, tensor_sum)
+    out_list, cov_loss = model(tensor_art, tensor_sum)
+
+    # out_list_tmp
 
     loss = torch.tensor(0.)
     loss = to_cuda(loss)
+
+    # loss_tmp = torch.tensor(0.)
+    # loss_tmp = to_cuda(loss_tmp)
     for j in range(out_list.shape[0]):
         # loss += criterion(out_list[j],tensor_sum[j,1:]) # '1:' Remove <SOS>
 
         k = remove_pad(tensor_sum[j, 1:])
+        # out_list_tmp
 
         loss += criterion(torch.log(out_list[j, :k - 1]), tensor_sum[j, 1:k])
-
-    # loss += cov_loss
+        # out_list[j]
+    loss += cov_loss
 
     # PRINT
     out_string = []

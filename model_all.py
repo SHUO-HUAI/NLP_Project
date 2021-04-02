@@ -63,7 +63,12 @@ class Model(nn.Module):
 
         # print('Coverage shape:',coverage.shape)
 
-        # cov_loss = 0
+        coverage = np.zeros(inputs.shape, np.long)  # Coverage has size (b x seq_length)
+        coverage = torch.Tensor(coverage)
+        coverage = to_cuda(coverage)
+        # print('Coverage shape:',coverage.shape)
+
+        cov_loss = 0
 
         next_input = to_cuda(target[:, 0])  # First word of summary (should be <SOS>)
         # print(self.dictionary.idx2word[next_input])    # <SOS>
@@ -111,6 +116,10 @@ class Model(nn.Module):
             # Probability of vocabulary
             # Concat context + state -> (hidden_dim*3]
             # cov_loss += torch.sum(torch.min(attn.clone(), coverage.clone()))
+
+            cov_loss += torch.sum(torch.min(attn.clone(), coverage.clone()))
+
+            coverage += attn
 
             cat = torch.cat([state.squeeze().view(batch_size, -1), context.view(batch_size, -1)], 1)
             v2_out = self.V2(self.V1(cat))
@@ -174,4 +183,4 @@ class Model(nn.Module):
         out_list = torch.stack(out_list, 1)
         # print('Out_List:', out_list)
 
-        return out_list
+        return out_list, cov_loss
