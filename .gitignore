@@ -137,8 +137,6 @@ stanford-corenlp-4.2.0/
 
 # IntelliJ
 /out/
-./data_full/
-./data_full_token/
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
@@ -151,3 +149,5 @@ com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
 fabric.properties
+/data_all_token/
+/data_all_token/*
