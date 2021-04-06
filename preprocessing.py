@@ -124,6 +124,7 @@ def tokenize_stories(stories_dir, tokenized_stories_dir):
 #         summaries.append(summary)
 #     return articles, summaries, dic
 
+
 def read_files(stories_path, tokenized_path):
     if type(tokenized_path) is not list:
         stories_path = [stories_path]
@@ -162,18 +163,17 @@ def prepare_data(articles, dic):
     articles_idx = []
     for article in articles:
         article_idx = []
-        words = article.rstrip().split()
-
+        # words = article.rstrip().split()
+        art_tokens = article.split(' ')
+        tokens = [t.strip() for t in art_tokens]  # strip
+        tokens = [t for t in tokens if t != ""]  # remove empty
         oov_idx = len(dic.idx2word)
-
-        for word in words:
-
+        for word in tokens:
             if word in dic.word2idx.keys():
                 article_idx.append(dic.word2idx[word])
             else:
                 article_idx.append(oov_idx)
                 oov_idx += 1
-
         articles_idx.append(article_idx)
     return articles_idx
 
@@ -182,11 +182,12 @@ def prepare_data(articles, dic):
 def prepare_summary(summaries, dic):
     summaries_idx = []
     for summary in summaries:
-        summary_idx = [dic.word2idx['<SOS>']]
-        words = summary.rstrip().split()
-        for word in words:
+        abs_tokens = summary.split(' ')
+        tokens = [t.strip() for t in abs_tokens]  # strip
+        tokens = [t for t in tokens if t != ""]  # remove empty
+        summary_idx = []
+        for word in tokens:
             summary_idx.append(dic.word2idx[word])
-        summary_idx.append(dic.word2idx['<EOS>'])
         summaries_idx.append(summary_idx)
     return summaries_idx
 
