@@ -22,11 +22,12 @@ from model_all import Model
 import config
 
 parser = argparse.ArgumentParser(description='PyTorch Get To The Point Training')
-parser.add_argument('--path', type=str, default=config.stories_path,
+parser.add_argument('--path', type=list, default=None,
                     help='path to the training data')
-parser.add_argument('--token_path', type=str, default=config.tokenized_path,
+parser.add_argument('--token_path', type=list, default=[config.cnn_tokenized_path, config.dm_tokenized_path],
                     help='path to the training data')
 
+start = time.time()
 args = parser.parse_args()
 
 path = args.path
@@ -52,7 +53,8 @@ tensor_art = torch.LongTensor(padded_articles)
 tensor_sum = torch.LongTensor(padded_summaries)
 
 articles_len = len(tensor_art[0])
-
+print(time.time() - start)
+exit()
 model = Model(dic, articles_len)
 model = to_cuda(model)
 

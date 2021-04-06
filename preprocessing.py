@@ -125,30 +125,34 @@ def tokenize_stories(stories_dir, tokenized_stories_dir):
 #     return articles, summaries, dic
 
 def read_files(stories_path, tokenized_path):
-    need_token = not os.path.exists(tokenized_path)
-    if need_token:
-        os.mkdir(tokenized_path)
-        tokenize_stories(stories_path, tokenized_path)
-
+    if type(tokenized_path) is not list:
+        stories_path = [stories_path]
+        tokenized_path = [tokenized_path]
     dic = Dictionary()
     articles = []
     summaries = []
 
-    stories = os.listdir(tokenized_path)
-    for story in stories:
-        article, abstract = get_art_abs(os.path.join(tokenized_path, story))
-        articles.append(article)
-        summaries.append(abstract)
+    for i in range(len(tokenized_path)):
+        need_token = not os.path.exists(tokenized_path[i])
+        if need_token:
+            os.mkdir(tokenized_path[i])
+            tokenize_stories(stories_path[i], tokenized_path[i])
 
-        art_tokens = article.split(' ')
-        abs_tokens = abstract.split(' ')
-        abs_tokens = [t for t in abs_tokens if
-                      t not in [SENTENCE_START, SENTENCE_END]]  # remove these tags from vocab
-        tokens = art_tokens + abs_tokens
-        tokens = [t.strip() for t in tokens]  # strip
-        tokens = [t for t in tokens if t != ""]  # remove empty
-        for token in tokens:
-            dic.add_word(token)
+        stories = os.listdir(tokenized_path[i])
+        for story in stories:
+            article, abstract = get_art_abs(os.path.join(tokenized_path[i], story))
+            articles.append(article)
+            summaries.append(abstract)
+
+            art_tokens = article.split(' ')
+            abs_tokens = abstract.split(' ')
+            abs_tokens = [t for t in abs_tokens if
+                          t not in [SENTENCE_START, SENTENCE_END]]  # remove these tags from vocab
+            tokens = art_tokens + abs_tokens
+            tokens = [t.strip() for t in tokens]  # strip
+            tokens = [t for t in tokens if t != ""]  # remove empty
+            for token in tokens:
+                dic.add_word(token)
 
     return articles, summaries, dic
 
