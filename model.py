@@ -140,30 +140,33 @@ class Model(nn.Module):
             # ... PROBABILITY OF COPYING HERE ...
             # ... PROBABILITY OF COPYING HERE ...
             
-            p_gen = p_gen.view(-1)[0]
+            
+            
+            p_gen = p_gen.view(-1)
+            
             p_copy = torch.tensor(1) - p_gen  # p_gen has shape [1,1] so doing [0][0] we get the raw number
             
             p_oov = []
             
             
             p_expanded_vocab = torch.zeros([batch_size,self.word_count + self.max_oovs])
-            p_expanded_vocab[:,:self.word_count] = p_vocab*p_gen
-            p_expanded_vocab += 1/self.word_count
-            #print(p_expanded_vocab)
-  
+            p_expanded_vocab += 1/self.word_count/100
+            #print(p_expanded_vocab.shape)
             
-            for b in range(inputs.shape[0]):
-                attn_idx = 0
-                for word in inputs[b]:
-                
-                    #if word in self.dictionary.word2idx.values():
-                    p_expanded_vocab[b][word.item()] += p_copy*attn[b][attn_idx]
+            p_expanded_vocab[:,:self.word_count] += p_vocab*p_gen.view(-1,1).repeat([1,p_vocab.shape[1]])
+            
+            attn_idx = 0
+            for word in inputs.view(-1,batch_size):
+            
+                tmp = torch.zeros(p_expanded_vocab.shape)
+                tmp.scatter_(1,word.view(-1,1),(p_copy*attn[:,attn_idx]).view(-1,1))
+                p_expanded_vocab += tmp
+                    
+                #else:
+                    #p_expanded_vocab[b][word.item()] += p_gen*attn[b][attn_idx]
+                    #pass
                         
-                    #else:
-                        #p_expanded_vocab[b][word.item()] += p_gen*attn[b][attn_idx]
-                        #pass
-                        
-                    attn_idx += 1
+                attn_idx += 1
                     
             
             #p_vocab += 1/self.word_count
