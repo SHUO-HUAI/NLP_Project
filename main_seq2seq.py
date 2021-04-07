@@ -152,6 +152,9 @@ def train(train_set, model, criterion, optimizer, epoch, dic, args):
         padded_articles = cur_batch[:, 0]
         padded_summaries = cur_batch[:, 1]
 
+        padded_articles = map(list, padded_articles)
+        padded_summaries = map(list, padded_summaries)
+
         print(padded_articles)
         for i in padded_articles:
             print(len(i))
