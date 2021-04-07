@@ -182,8 +182,8 @@ def train(train_set, model, criterion, optimizer, epoch, dic, args):
 
         loss += cov_loss
 
-        if print_count % 100 == 0:
-            print('Epoch: [' + str(epoch) + '] [' + str(print_count) + '/' + str(batch_num) + ']', 'Loss ', loss)
+        # if print_count % 100 == 0:
+        print('Epoch: [' + str(epoch) + '] [' + str(print_count) + '/' + str(batch_num) + ']', 'Loss ', loss)
 
         loss.backward()
         optimizer.step()
