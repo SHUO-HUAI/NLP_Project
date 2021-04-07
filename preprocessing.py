@@ -168,7 +168,7 @@ def prepare_train_art_sum(train_path, dic_out_path, out_path):
 
     with open(train_path, 'r', encoding="utf8") as f:
         for art_name in f:
-            article, summary = get_art_abs(art_name)
+            article, summary = get_art_abs(art_name.strip())
 
             art_tokens = article.split(' ')
             art_tokens = [t.strip() for t in art_tokens]  # strip
@@ -214,7 +214,7 @@ def prepare_valid_art_sum(valid_path, out_path, dic):
 
     with open(valid_path, 'r', encoding="utf8") as f:
         for art_name in f:
-            article, summary = get_art_abs(art_name)
+            article, summary = get_art_abs(art_name.strip())
 
             oov_dic = {}
             oov_idx = len(dic.word2idx)
