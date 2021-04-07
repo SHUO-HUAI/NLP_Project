@@ -229,7 +229,7 @@ def prepare_train_art_sum(train_path, dic_out_path, out_path):
         if not os.path.exists(out_path):
             os.mkdir(out_path)
 
-        with open(out_path + 'train_set', 'wb+') as output:
+        with open(os.path.join(out_path, 'train_set'), 'wb+') as output:
             pickle.dump(padded_train, output, pickle.HIGHEST_PROTOCOL)
 
     return dic
