@@ -43,18 +43,18 @@ class Model(nn.Module):
         input_len = inputs.size(-1)  # max input sequence length
         target_len = target.size(-1)  # max target sequence length
 
-        inputs = inputs.view(-1,
-                             input_len)
-        # If I pass only 1 article and 1 summary I add one dimension at the
-        # beginning (useful for test)
-        target = target.view(-1, target_len)
+        # inputs = inputs.view(-1,
+        #                      input_len)
+        # # If I pass only 1 article and 1 summary I add one dimension at the
+        # # beginning (useful for test)
+        # target = target.view(-1, target_len)
 
         batch_size = inputs.size(0)
 
         unked_inputs = get_unked(inputs, self.dictionary)
 
-        inputs = to_cuda(inputs)
-        target = to_cuda(target)
+        # inputs = to_cuda(inputs)
+        # target = to_cuda(target)
         unked_inputs = to_cuda(unked_inputs)
 
         # print('Input shape:',inputs.shape)  # Size [b x input_len]

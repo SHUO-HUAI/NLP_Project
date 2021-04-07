@@ -1,4 +1,5 @@
 import argparse
+import math
 import os
 from os import listdir
 from os.path import isfile, join
@@ -20,11 +21,20 @@ from functions import to_cuda
 from preprocessing import read_files, prepare_data, prepare_summary, zero_pad, remove_pad
 from model_all import Model
 import config
+import shutil
+from rouge import Rouge
 
 parser = argparse.ArgumentParser(description='PyTorch Get To The Point Training')
 # parser.add_argument('--path', type=list, default=None,
 #                     help='path to the training data')
 parser.add_argument('--split_file', type=dict, default=config.split_file, help='path to the training data')
+parser.add_argument('--load_data', type=str, default=config.load_data, help='path to the data after preprocessing')
+parser.add_argument('--resume', type=str, default=config.resume, help='path to the resume checkpoint')
+parser.add_argument('--epoch', type=int, default=config.epoch, help='path to the resume checkpoint')
+parser.add_argument('--save', type=str, default=config.save, help='path to the resume checkpoint')
+parser.add_argument('--batch_size', type=int, default=config.batch_size, help='path to the resume checkpoint')
+
+best_acc1 = 0.0
 
 
 def data_process(args):
@@ -52,66 +62,181 @@ def data_process(args):
     # Save function here
 
 
+def data_loader(args):
+    train_set, val_set, test_set, dic = [[[1]], [[2]]], None, None, None
+    return train_set, val_set, test_set, dic
+
+
+def validate(val_set, model, criterion, args):
+    model.eval()
+    print_count = 0
+    end = time.time()
+
+    data_size = len(val_set)
+    start_tmp = 0
+    batch_num = math.ceil(data_size / args.batch_size)
+
+    with torch.no_grad():
+        while start_tmp < data_size:
+
+            print_count += 1
+            if start_tmp + args.batch_size < data_size:
+                cur_batch = val_set[start_tmp: start_tmp + args.batch_size]
+                start_tmp = start_tmp + args.batch_size
+            else:
+                cur_batch = val_set[start_tmp:]
+
+            padded_articles = cur_batch[:, 0]
+            padded_summaries = cur_batch[:, 1]
+
+            tensor_art = torch.LongTensor(padded_articles)
+            tensor_sum = torch.LongTensor(padded_summaries)
+
+            tensor_art = to_cuda(tensor_art)
+            tensor_sum = to_cuda(tensor_sum)
+
+            out_list, _ = model(tensor_art, tensor_sum)
+
+            output_list = []
+            target_list = []
+
+            for j in range(out_list.shape[0]):
+                k = remove_pad(tensor_sum[j, 1:])
+                out_tmp = ' '.join(map(str, torch.argmax(out_list[j, :k - 1], 1).cpu().numpy()))
+                tar_tmp = ' '.join(map(str, torch.argmax(tensor_sum[j, 1:k], 1).cpu().numpy()))
+
+                output_list.append(out_tmp)
+                target_list.append(tar_tmp)
+
+        acc = accuracy(output_list, target_list)
+    return acc
+
+
+def train(train_set, model, criterion, optimizer, epoch, dic, args):
+    model.train()
+    print('Start of Epoch: ', epoch)
+    print_count = 0
+    end = time.time()
+
+    np.random.shuffle(train_set)
+
+    data_size = len(train_set)
+    start_tmp = 0
+    batch_num = math.ceil(data_size / args.batch_size)
+
+    while start_tmp < data_size:
+
+        print_count += 1
+        if start_tmp + args.batch_size < data_size:
+            cur_batch = train_set[start_tmp: start_tmp + args.batch_size]
+            start_tmp = start_tmp + args.batch_size
+        else:
+            cur_batch = train_set[start_tmp:]
+
+        padded_articles = cur_batch[:, 0]
+        padded_summaries = cur_batch[:, 1]
+
+        tensor_art = torch.LongTensor(padded_articles)
+        tensor_sum = torch.LongTensor(padded_summaries)
+
+        tensor_art = to_cuda(tensor_art)
+        tensor_sum = to_cuda(tensor_sum)
+
+        optimizer.zero_grad()
+
+        out_list, cov_loss = model(tensor_art, tensor_sum)
+
+        loss = torch.tensor(0.)
+        loss = to_cuda(loss)
+
+        for j in range(out_list.shape[0]):
+            k = remove_pad(tensor_sum[j, 1:])
+
+            loss += criterion(torch.log(out_list[j, :k - 1]), tensor_sum[j, 1:k])
+
+        loss += cov_loss
+
+        if print_count % 100 == 0:
+            print('Epoch: [' + str(epoch) + '] [' + str(print_count) + '/' + str(batch_num) + ']', 'Loss ', loss)
+
+        loss.backward()
+        optimizer.step()
+    print('End of Epoch', epoch, 'time cost', time.time() - end)
+
+
+def accuracy(output, target):
+    rouge = Rouge()
+    rouge_score = rouge.get_scores(output, target, avg=True)
+    r1 = rouge_score["rouge-1"]['r']
+    r2 = rouge_score["rouge-2"]['r']
+    rl = rouge_score["rouge-l"]['r']
+    return (r1 + r2 + rl) / 3
+
+
+def save_checkpoint(state, is_best, folder):
+    filename = os.path.join(folder, 'checkpoint.pth.tar')
+    torch.save(state, filename)
+    if is_best:
+        shutil.copyfile(filename, os.path.join(folder, 'model_best.pth.tar'))
+
+
 def main():
+    global best_acc1
     args = parser.parse_args()
+    load_data_floder = args.load_data
+
+    if_load = os.path.exists(load_data_floder)
+    if not if_load:
+        data_process(args)
+
+    assert os.path.exists(load_data_floder)
+
+    # train_set = [[train_art1, train_sum1],[train_art2, train_sum2], ...] and val_set, test_set
+    train_set, val_set, test_set, dic = data_loader(args)
+
+    articles_len = len(train_set[0][0])
+
+    # Model
+    model = Model(dic, articles_len)
+    model = to_cuda(model)
+
+    optimizer = optim.Adam(params=model.parameters(), lr=0.01)
+    criterion = nn.NLLLoss()
+
+    if args.resume:
+        if os.path.isfile(args.resume):
+            print("=> loading checkpoint '{}'".format(args.resume))
+            checkpoint = torch.load(args.resume)
+            args.start_epoch = checkpoint['epoch']
+            best_acc1 = checkpoint['best_acc1']
+            model.load_state_dict(checkpoint['state_dict'])
+            optimizer.load_state_dict(checkpoint['optimizer'])
+            print("=> loaded checkpoint '{}' (epoch {})"
+                  .format(args.resume, checkpoint['epoch']))
+        else:
+            print("=> no checkpoint found at '{}'".format(args.resume))
+
+    if args.evaluate:
+        validate(val_set, model, criterion, args)
+        return
+    if args.test:
+        validate(test_set, model, criterion, args)
+        return
+
+    for epoch in range(args.start_epoch, args.epochs):
+        # adjust learning rate ?????
+        train(train_set, model, criterion, optimizer, epoch, dic, args)
+        acc1 = validate(val_set, model, criterion, args)
+        is_best = acc1 > best_acc1
+        best_acc1 = max(acc1, best_acc1)
+
+        save_checkpoint({
+            'epoch': epoch + 1,
+            'state_dict': model.state_dict(),
+            'best_acc1': best_acc1,
+            'optimizer': optimizer.state_dict(),
+        }, is_best, args.save)
 
 
-start = time.time()
-
-tensor_art = torch.LongTensor(padded_articles)
-tensor_sum = torch.LongTensor(padded_summaries)
-
-articles_len = len(tensor_art[0])
-print(time.time() - start)
-exit()
-model = Model(dic, articles_len)
-model = to_cuda(model)
-
-# TEMPORARY CODE
-# TEMPORARY CODE
-# TEMPORARY CODE
-
-opt = optim.Adam(params=model.parameters(), lr=0.01)
-criterion = nn.NLLLoss()
-
-# torch.autograd.set_detect_anomaly(True)
-
-for i in range(100):
-    print('Epoch:', i + 1)
-
-    opt.zero_grad()
-
-    out_list, cov_loss = model(tensor_art, tensor_sum)
-
-    # out_list_tmp
-
-    loss = torch.tensor(0.)
-    loss = to_cuda(loss)
-
-    # loss_tmp = torch.tensor(0.)
-    # loss_tmp = to_cuda(loss_tmp)
-    for j in range(out_list.shape[0]):
-        # loss += criterion(out_list[j],tensor_sum[j,1:]) # '1:' Remove <SOS>
-
-        k = remove_pad(tensor_sum[j, 1:])
-        # out_list_tmp
-
-        loss += criterion(torch.log(out_list[j, :k - 1]), tensor_sum[j, 1:k])
-        # out_list[j]
-    loss += cov_loss
-
-    # PRINT
-    out_string = []
-    for word in out_list[j, :k - 1]:
-        out_string.append(dic.idx2word[torch.argmax(word)])
-
-    print(out_string)
-    # PRINT
-
-    # loss = criterion(out_list,tensor_sum[:,1:])+cov_loss
-    print('Loss:', loss)
-
-    loss.backward()
-    opt.step()
-
-# model(tensor_art[0:3], tensor_sum[0:3])
+if __name__ == '__main__':
+    main()
