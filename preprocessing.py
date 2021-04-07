@@ -168,57 +168,28 @@ def prepare_train_art_sum(train_path, dic_out_path, out_path):
 
     with open(train_path, 'r', encoding="utf8") as f:
         for art_name in f:
-            print(art_name)
-            exit()
-            with open(art_name.rstrip(), 'r', encoding="utf8") as art_file:
+            article, summary = get_art_abs(art_name)
 
-                highlight_flag = False
+            art_tokens = article.split(' ')
+            art_tokens = [t.strip() for t in art_tokens]  # strip
+            art_tokens = [t for t in art_tokens if t != ""]  # remove empty
+            sum_tokens = summary.split(' ')
+            sum_tokens = [t.strip() for t in sum_tokens]  # strip
+            sum_tokens = [t for t in sum_tokens if t != ""]  # remove empty
 
-                article = ''
-                summary = ''
+            art_idx = []
+            sum_idx = []
 
-                for line in art_file:
+            for token in art_tokens:
+                dic.add_word(token)
+                art_idx.append(dic.word2idx[token])
 
-                    if line.startswith('@highlight'):
-                        highlight_flag = True
+            for token in sum_tokens:
+                dic.add_word(token)
+                sum_idx.append(dic.word2idx[token])
 
-                    else:
-                        if line.rstrip():
-                            if highlight_flag == True:
-
-                                # HIGHLIGHT
-
-                                highlight = '<SOS> ' + line.rstrip() + ' <EOS> '
-                                summary = summary + highlight
-
-                                highlight_flag = False
-
-                            else:
-
-                                # ARTICLE
-
-                                article = article + line.rstrip() + ' '
-
-                art_tokens = article.split(' ')
-                art_tokens = [t.strip() for t in art_tokens]  # strip
-                art_tokens = [t for t in art_tokens if t != ""]  # remove empty
-                sum_tokens = summary.split(' ')
-                sum_tokens = [t.strip() for t in sum_tokens]  # strip
-                sum_tokens = [t for t in sum_tokens if t != ""]  # remove empty
-
-                art_idx = []
-                sum_idx = []
-
-                for token in art_tokens:
-                    dic.add_word(token)
-                    art_idx.append(dic.word2idx[token])
-
-                for token in sum_tokens:
-                    dic.add_word(token)
-                    sum_idx.append(dic.word2idx[token])
-
-                articles_idx.append(art_idx)
-                summaries_idx.append(sum_idx)
+            articles_idx.append(art_idx)
+            summaries_idx.append(sum_idx)
 
         padded_articles = zero_pad(articles_idx)
         padded_summaries = zero_pad(summaries_idx)
@@ -243,79 +214,51 @@ def prepare_valid_art_sum(valid_path, out_path, dic):
 
     with open(valid_path, 'r', encoding="utf8") as f:
         for art_name in f:
+            article, summary = get_art_abs(art_name)
 
             oov_dic = {}
             oov_idx = len(dic.word2idx)
 
-            with open(art_name.rstrip(), 'r', encoding="utf8") as art_file:
+            art_tokens = article.split(' ')
+            art_tokens = [t.strip() for t in art_tokens]  # strip
+            art_tokens = [t for t in art_tokens if t != ""]  # remove empty
+            sum_tokens = summary.split(' ')
+            sum_tokens = [t.strip() for t in sum_tokens]  # strip
+            sum_tokens = [t for t in sum_tokens if t != ""]  # remove empty
 
-                highlight_flag = False
+            art_idx = []
+            sum_idx = []
 
-                article = ''
-                summary = ''
+            for token in art_tokens:
+                if token in dic.word2idx.keys():
+                    art_idx.append(dic.word2idx[token])
 
-                for line in art_file:
-
-                    if line.startswith('@highlight'):
-                        highlight_flag = True
-
-                    else:
-                        if line.rstrip():
-                            if highlight_flag == True:
-
-                                # HIGHLIGHT
-
-                                highlight = '<SOS> ' + line.rstrip() + ' <EOS> '
-                                summary = summary + highlight
-
-                                highlight_flag = False
-
-                            else:
-
-                                # ARTICLE
-
-                                article = article + line.rstrip() + ' '
-
-                art_tokens = article.split(' ')
-                art_tokens = [t.strip() for t in art_tokens]  # strip
-                art_tokens = [t for t in art_tokens if t != ""]  # remove empty
-                sum_tokens = summary.split(' ')
-                sum_tokens = [t.strip() for t in sum_tokens]  # strip
-                sum_tokens = [t for t in sum_tokens if t != ""]  # remove empty
-
-                art_idx = []
-                sum_idx = []
-
-                for token in art_tokens:
-                    if token in dic.word2idx.keys():
-                        art_idx.append(dic.word2idx[token])
+                else:
+                    if token in oov_dic:
+                        art_idx.append(oov_dic[token])
 
                     else:
-                        if token in oov_dic:
-                            art_idx.append(oov_dic[token])
+                        art_idx.append(oov_idx)
+                        oov_dic[token] = oov_idx
+                        oov_idx += 1
 
-                        else:
-                            art_idx.append(oov_idx)
-                            oov_dic[token] = oov_idx
-                            oov_idx += 1
+            for token in sum_tokens:
+                if token in dic.word2idx.keys():
+                    sum_idx.append(dic.word2idx[token])
 
-                for token in sum_tokens:
-                    if token in dic.word2idx.keys():
-                        sum_idx.append(dic.word2idx[token])
+                else:
+                    if token in oov_dic:
+                        sum_idx.append(oov_dic[token])
 
                     else:
-                        if token in oov_dic:
-                            sum_idx.append(oov_dic[token])
+                        sum_idx.append(oov_idx)
+                        oov_dic[token] = oov_idx
+                        oov_idx += 1
 
-                        else:
-                            sum_idx.append(oov_idx)
-                            oov_dic[token] = oov_idx
-                            oov_idx += 1
+            # print(oov_idx)
 
-                # print(oov_idx)
-
-                articles_idx.append(art_idx)
-                summaries_idx.append(sum_idx)
+            articles_idx.append(art_idx)
+            summaries_idx.append(sum_idx)
 
         padded_articles = zero_pad(articles_idx)
         padded_summaries = zero_pad(summaries_idx)

@@ -57,3 +57,33 @@ for i in range(100):
     opt.step()
 
 model(tensor_art[0:3], tensor_sum[0:3])
+
+    #
+    # with open(art_name.rstrip(), 'r', encoding="utf8") as art_file:
+    #
+    #     highlight_flag = False
+    #
+    #     article = ''
+    #     summary = ''
+    #
+    #     for line in art_file:
+    #
+    #         if line.startswith('@highlight'):
+    #             highlight_flag = True
+    #
+    #         else:
+    #             if line.rstrip():
+    #                 if highlight_flag == True:
+    #
+    #                     # HIGHLIGHT
+    #
+    #                     highlight = '<SOS> ' + line.rstrip() + ' <EOS> '
+    #                     summary = summary + highlight
+    #
+    #                     highlight_flag = False
+    #
+    #                 else:
+    #
+    #                     # ARTICLE
+    #
+    #                     article = article + line.rstrip() + ' '
