@@ -30,7 +30,7 @@ parser = argparse.ArgumentParser(description='PyTorch Get To The Point Training'
 parser.add_argument('--split_file', type=dict, default=config.split_file, help='path to the training data')
 parser.add_argument('--load_data', type=str, default=config.load_data, help='path to the data after preprocessing')
 parser.add_argument('--resume', type=str, default=config.resume, help='path to the resume checkpoint')
-parser.add_argument('--epoch', type=int, default=config.epoch, help='path to the resume checkpoint')
+parser.add_argument('--epochs', type=int, default=config.epoch, help='path to the resume checkpoint')
 parser.add_argument('--save', type=str, default=config.save, help='path to the resume checkpoint')
 parser.add_argument('--batch_size', type=int, default=config.batch_size, help='path to the resume checkpoint')
 parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',
