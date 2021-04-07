@@ -13,12 +13,14 @@ from collections import Counter
 from torch.autograd import Variable
 import time
 import classes
+from classes import Dictionary
 import preprocessing
 import model
 import functions
 from functions import to_cuda
-from preprocessing import read_files, prepare_data, prepare_summary, zero_pad, remove_pad, get_unked
+from preprocessing import read_files, prepare_data, prepare_summary, zero_pad, remove_pad, get_unked, prepare_train_art_sum
 from model import Model
+import pickle
 import config
 
 parser = argparse.ArgumentParser(description='PyTorch Get To The Point Training')
@@ -48,8 +50,22 @@ sum_idx = prepare_summary(summaries, dic)
 # print(unked_hello)
 # exit()
 
-padded_articles = zero_pad(art_idx)
-padded_summaries = zero_pad(sum_idx)
+#prepare TRAIN
+train_path = 'train_all.txt'
+dic_path = 'dictionary'
+train_out_path = 'data_finish/train/'
+prepare_train_art_sum(train_path, dic_path, train_out_path)
+
+vocab = Dictionary()
+with open(dic_path, 'rb') as input:
+    vocab = pickle.load(input)
+    
+with open(train_out_path+'articles', 'rb') as input:
+    padded_articles = pickle.load(input)
+    
+with open(train_out_path+'summaries', 'rb') as input:
+    padded_summaries = pickle.load(input)
+
 
 print('Length of padded articles:', len(padded_articles[0]))
 print('Length of padded summaries:', len(padded_summaries[0]))

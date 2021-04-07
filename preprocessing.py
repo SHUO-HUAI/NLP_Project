@@ -3,9 +3,11 @@ from os import listdir
 from os.path import isfile, join
 from io import open
 import numpy as np
+import time
 import torch
 import classes
 import subprocess
+import pickle
 from classes import Dictionary
 
 # according to https://github.com/abisee/cnn-dailymail/blob/master/make_datafiles.py
@@ -125,19 +127,19 @@ def tokenize_stories(stories_dir, tokenized_stories_dir):
 #     return articles, summaries, dic
 
 
-def read_files(tokenized_path):
+def read_files(stories_path, tokenized_path):
     if type(tokenized_path) is not list:
-        # stories_path = [stories_path]
+        stories_path = [stories_path]
         tokenized_path = [tokenized_path]
     dic = Dictionary()
     articles = []
     summaries = []
 
     for i in range(len(tokenized_path)):
-        # need_token = not os.path.exists(tokenized_path[i])
-        # if need_token:
-        #     os.mkdir(tokenized_path[i])
-        #     tokenize_stories(stories_path[i], tokenized_path[i])
+        need_token = not os.path.exists(tokenized_path[i])
+        if need_token:
+            os.mkdir(tokenized_path[i])
+            tokenize_stories(stories_path[i], tokenized_path[i])
 
         stories = os.listdir(tokenized_path[i])
         for story in stories:
@@ -156,6 +158,96 @@ def read_files(tokenized_path):
                 dic.add_word(token)
 
     return articles, summaries, dic
+
+#data path is train_all.txt or valid_all.txt or test_all.txt
+def prepare_train_art_sum(train_path, dic_out_path, train_out_path):
+    
+    articles_idx = []
+    summaries_idx = []
+    
+    dic = Dictionary()
+    i = 0
+    
+    with open(train_path, 'r', encoding="utf8") as f:
+        for art_name in f:
+            with open(art_name.rstrip(), 'r', encoding="utf8") as art_file:
+            
+                highlight_flag = False
+                
+                article = ''
+                summary = ''
+                
+                for line in art_file:
+                    
+                    if line.startswith('@highlight'):
+                        highlight_flag = True
+                    
+                    else:
+                        if line.rstrip():
+                            if highlight_flag == True:
+                                
+                                #HIGHLIGHT
+                                
+                                highlight = '<SOS> '+line.rstrip()+' <EOS> '
+                                summary = summary + highlight
+                                
+                                highlight_flag = False
+                            
+                            else:
+                                
+                                #ARTICLE
+                                
+                                article = article+line.rstrip()+' '
+                                
+                
+                art_tokens = article.split(' ')
+                art_tokens = [t.strip() for t in art_tokens]  # strip
+                art_tokens = [t for t in art_tokens if t != ""]  # remove empty
+                sum_tokens = summary.split(' ')
+                sum_tokens = [t.strip() for t in sum_tokens]  # strip
+                sum_tokens = [t for t in sum_tokens if t != ""]  # remove empty
+                
+                art_idx = []
+                sum_idx = []
+                
+                for token in art_tokens:
+                    dic.add_word(token)
+                    art_idx.append(dic.word2idx[token])
+                    
+                for token in sum_tokens:
+                    dic.add_word(token)
+                    sum_idx.append(dic.word2idx[token])
+                    
+                articles_idx.append(art_idx)
+                summaries_idx.append(sum_idx)
+                
+                ## READ ONLY 100 ARTICLES
+                i += 1
+                if(i==100):
+                    break
+                    
+                
+            
+        
+        #print(len(articles_idx))
+        #print(len(summaries_idx))
+        #print(len(dic.word2idx))
+            
+        padded_articles = zero_pad(articles_idx)
+        padded_summaries = zero_pad(summaries_idx)
+        
+        with open(dic_out_path, 'wb') as output:
+            pickle.dump(dic, output, pickle.HIGHEST_PROTOCOL)
+            
+        
+        with open(train_out_path+'articles', 'wb') as output:
+            pickle.dump(padded_articles, output, pickle.HIGHEST_PROTOCOL)
+            
+        with open(train_out_path+'summaries', 'wb') as output:
+            pickle.dump(padded_summaries, output, pickle.HIGHEST_PROTOCOL)
+                        
+                    
+            
 
 
 # Given the articles strings and a dictionary, return the arrays of words converted to indexes
