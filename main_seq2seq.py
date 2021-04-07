@@ -38,6 +38,7 @@ best_acc1 = 0.0
 
 
 def data_process(args):
+    os.mkdir(args.load_data)
     split_file = args.split_file
 
     test_path = split_file['test']
@@ -53,8 +54,6 @@ def data_process(args):
 
 
 def data_loader(args):
-
-    os.mkdir(args.load_data)
 
     dic_path = os.path.join(args.load_data, 'dictionary')
     out_path = args.load_data
