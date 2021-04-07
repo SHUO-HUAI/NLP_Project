@@ -14,13 +14,13 @@ from functions import to_cuda
 
 class Model(nn.Module):
 
-    def __init__(self, dic, art_len, emb_dim=128, hidden_dim=256, max_oovs=100):
+    def __init__(self, dic, emb_dim=128, hidden_dim=256, max_oovs=100):
         super(Model, self).__init__()
 
         self.emb_dim = emb_dim  # Word embedding dimension
         self.hidden_dim = hidden_dim  # Hidden layer for encoder (BiLSTM) and decoder (LSTM)
         self.word_count = len(dic.word2idx)  # Vocabulary size
-        self.art_len = art_len
+        # self.art_len = art_len
         self.dictionary = dic  # Saving the dictionary
         self.max_oovs = max_oovs
 
@@ -30,7 +30,7 @@ class Model(nn.Module):
 
         self.Wh = nn.Linear(self.hidden_dim * 2, self.hidden_dim)  # for obtaining e from encoder hidden states
         self.Ws = nn.Linear(self.hidden_dim, self.hidden_dim)  # for obtaining e from current state
-        self.Wc = nn.Linear(self.art_len, self.hidden_dim)  # for obtaining e from context vector
+        # self.Wc = nn.Linear(self.art_len, self.hidden_dim)  # for obtaining e from context vector
         self.v = nn.Linear(hidden_dim, 1)  # for changing to scalar
 
         self.wh = nn.Linear(hidden_dim * 2, 1)  # for changing context vector into a scalar
