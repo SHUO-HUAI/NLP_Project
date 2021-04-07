@@ -14,9 +14,7 @@ from collections import Counter
 from torch.autograd import Variable
 import time
 import classes
-import preprocessing
 import model
-import functions
 from functions import to_cuda
 from preprocessing import read_files, prepare_data, prepare_summary, zero_pad, remove_pad
 from model_all import Model
@@ -67,10 +65,9 @@ def data_loader(args):
     return train_set, val_set, test_set, dic
 
 
-def validate(val_set, model, criterion, args):
+def validate(val_set, model, args):
     model.eval()
     print_count = 0
-    end = time.time()
 
     data_size = len(val_set)
     start_tmp = 0
@@ -107,6 +104,9 @@ def validate(val_set, model, criterion, args):
 
                 output_list.append(out_tmp)
                 target_list.append(tar_tmp)
+
+            if print_count % 100 == 0:
+                print('Test [' + str(print_count) + '/' + str(batch_num) + ']')
 
         acc = accuracy(output_list, target_list)
     return acc
@@ -217,10 +217,10 @@ def main():
             print("=> no checkpoint found at '{}'".format(args.resume))
 
     if args.evaluate:
-        validate(val_set, model, criterion, args)
+        validate(val_set, model, args)
         return
     if args.test:
-        validate(test_set, model, criterion, args)
+        validate(test_set, model, args)
         return
 
     for epoch in range(args.start_epoch, args.epochs):
