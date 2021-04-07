@@ -160,199 +160,168 @@ def read_files(stories_path, tokenized_path):
     return articles, summaries, dic
 
 
-
-
-
 def prepare_train_art_sum(train_path, dic_out_path, out_path):
-    
     articles_idx = []
     summaries_idx = []
-    
+
     dic = Dictionary()
-    i = 0
-    
+
     with open(train_path, 'r', encoding="utf8") as f:
         for art_name in f:
             with open(art_name.rstrip(), 'r', encoding="utf8") as art_file:
-            
+
                 highlight_flag = False
-                
+
                 article = ''
                 summary = ''
-                
+
                 for line in art_file:
-                    
+
                     if line.startswith('@highlight'):
                         highlight_flag = True
-                    
+
                     else:
                         if line.rstrip():
                             if highlight_flag == True:
-                                
-                                #HIGHLIGHT
-                                
-                                highlight = '<SOS> '+line.rstrip()+' <EOS> '
+
+                                # HIGHLIGHT
+
+                                highlight = '<SOS> ' + line.rstrip() + ' <EOS> '
                                 summary = summary + highlight
-                                
+
                                 highlight_flag = False
-                            
+
                             else:
-                                
-                                #ARTICLE
-                                
-                                article = article+line.rstrip()+' '
-                                
-                
+
+                                # ARTICLE
+
+                                article = article + line.rstrip() + ' '
+
                 art_tokens = article.split(' ')
                 art_tokens = [t.strip() for t in art_tokens]  # strip
                 art_tokens = [t for t in art_tokens if t != ""]  # remove empty
                 sum_tokens = summary.split(' ')
                 sum_tokens = [t.strip() for t in sum_tokens]  # strip
                 sum_tokens = [t for t in sum_tokens if t != ""]  # remove empty
-                
+
                 art_idx = []
                 sum_idx = []
-                
+
                 for token in art_tokens:
                     dic.add_word(token)
                     art_idx.append(dic.word2idx[token])
-                    
+
                 for token in sum_tokens:
                     dic.add_word(token)
                     sum_idx.append(dic.word2idx[token])
-                    
+
                 articles_idx.append(art_idx)
                 summaries_idx.append(sum_idx)
-                
-                ## READ ONLY 100 ARTICLES
-                i += 1
-                if(i==100):
-                    break
-                    
-                
-            
-        
-        #print(len(articles_idx))
-        #print(len(summaries_idx))
-        #print(len(dic.word2idx))
-            
+
         padded_articles = zero_pad(articles_idx)
         padded_summaries = zero_pad(summaries_idx)
-        
-        padded_train = np.transpose(np.array([padded_articles,padded_summaries], dtype=object))
-        
+
+        padded_train = np.transpose(np.array([padded_articles, padded_summaries], dtype=object))
+
         with open(dic_out_path, 'wb') as output:
             pickle.dump(dic, output, pickle.HIGHEST_PROTOCOL)
-            
+
         if not os.path.exists(out_path):
             os.mkdir(out_path)
-        
-        with open(out_path+'train_set', 'wb') as output:
-            pickle.dump(padded_train, output, pickle.HIGHEST_PROTOCOL)
-            
-            
 
-                        
+        with open(out_path + 'train_set', 'wb') as output:
+            pickle.dump(padded_train, output, pickle.HIGHEST_PROTOCOL)
+
+    return dic
+
+
 def prepare_valid_art_sum(valid_path, out_path, dic):
-    
     articles_idx = []
     summaries_idx = []
-    
+
     with open(valid_path, 'r', encoding="utf8") as f:
         for art_name in f:
-        
+
             oov_dic = {}
             oov_idx = len(dic.word2idx)
-            
+
             with open(art_name.rstrip(), 'r', encoding="utf8") as art_file:
-            
+
                 highlight_flag = False
-                
+
                 article = ''
                 summary = ''
-                
+
                 for line in art_file:
-                    
+
                     if line.startswith('@highlight'):
                         highlight_flag = True
-                    
+
                     else:
                         if line.rstrip():
                             if highlight_flag == True:
-                                
-                                #HIGHLIGHT
-                                
-                                highlight = '<SOS> '+line.rstrip()+' <EOS> '
+
+                                # HIGHLIGHT
+
+                                highlight = '<SOS> ' + line.rstrip() + ' <EOS> '
                                 summary = summary + highlight
-                                
+
                                 highlight_flag = False
-                            
+
                             else:
-                                
-                                #ARTICLE
-                                
-                                article = article+line.rstrip()+' '
-                                
-                
+
+                                # ARTICLE
+
+                                article = article + line.rstrip() + ' '
+
                 art_tokens = article.split(' ')
                 art_tokens = [t.strip() for t in art_tokens]  # strip
                 art_tokens = [t for t in art_tokens if t != ""]  # remove empty
                 sum_tokens = summary.split(' ')
                 sum_tokens = [t.strip() for t in sum_tokens]  # strip
                 sum_tokens = [t for t in sum_tokens if t != ""]  # remove empty
-                
+
                 art_idx = []
                 sum_idx = []
-                
+
                 for token in art_tokens:
                     if token in dic.word2idx.keys():
                         art_idx.append(dic.word2idx[token])
-                        
+
                     else:
                         if token in oov_dic:
                             art_idx.append(oov_dic[token])
-                        
+
                         else:
                             art_idx.append(oov_idx)
                             oov_dic[token] = oov_idx
                             oov_idx += 1
-                    
+
                 for token in sum_tokens:
                     if token in dic.word2idx.keys():
                         sum_idx.append(dic.word2idx[token])
-                        
+
                     else:
                         if token in oov_dic:
                             sum_idx.append(oov_dic[token])
-                            
+
                         else:
                             sum_idx.append(oov_idx)
                             oov_dic[token] = oov_idx
                             oov_idx += 1
-                            
-                #print(oov_idx)
-                    
+
+                # print(oov_idx)
+
                 articles_idx.append(art_idx)
                 summaries_idx.append(sum_idx)
-            
-            
+
         padded_articles = zero_pad(articles_idx)
         padded_summaries = zero_pad(summaries_idx)
-        
-        padded_valid = np.transpose(np.array([padded_articles,padded_summaries], dtype=object))
-        
-        
+
+        padded_valid = np.transpose(np.array([padded_articles, padded_summaries], dtype=object))
+
         with open(out_path, 'wb') as output:
             pickle.dump(padded_valid, output, pickle.HIGHEST_PROTOCOL)
-            
-            
-
-
-
-
-
-
-
 
 
 # Given the articles strings and a dictionary, return the arrays of words converted to indexes

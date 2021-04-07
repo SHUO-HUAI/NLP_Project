@@ -1,6 +1,7 @@
 import argparse
 import math
 import os
+import pickle
 from os import listdir
 from os.path import isfile, join
 from io import open
@@ -13,10 +14,11 @@ import numpy as np
 from collections import Counter
 from torch.autograd import Variable
 import time
-import classes
+from classes import Dictionary
 import model
 from functions import to_cuda
-from preprocessing import read_files, prepare_data, prepare_summary, zero_pad, remove_pad
+from preprocessing import read_files, prepare_data, prepare_summary, zero_pad, remove_pad, prepare_train_art_sum, \
+    prepare_valid_art_sum
 from model_all import Model
 import config
 import shutil
@@ -38,31 +40,42 @@ best_acc1 = 0.0
 def data_process(args):
     split_file = args.split_file
 
-    test_files_name = split_file['test']
-    train_files_name = split_file['train']
-    val_files_name = split_file['val']
+    test_path = split_file['test']
+    train_path = split_file['train']
+    valid_path = split_file['val']
 
-    # read all
+    dic_path = os.path.join(args.load_data, 'dictionary')
+    out_path = args.load_data
 
-    articles, summaries, dic = read_files(token_path)
-
-    word_count = len(dic)
-    print('Number of unique words:', word_count)
-
-    art_idx = prepare_data(articles, dic)
-    sum_idx = prepare_summary(summaries, dic)
-
-    padded_articles = zero_pad(art_idx)
-    padded_summaries = zero_pad(sum_idx)
-
-    print('Length of padded articles:', len(padded_articles[0]))
-    print('Length of padded summaries:', len(padded_summaries[0]))
-    # Save function here
+    dic = prepare_train_art_sum(train_path, dic_path, out_path)
+    prepare_valid_art_sum(valid_path, os.path.join(out_path, 'valid_set'), dic)
+    prepare_valid_art_sum(test_path, os.path.join(out_path, 'test_set'), dic)
 
 
 def data_loader(args):
-    train_set, val_set, test_set, dic = [[[1]], [[2]]], None, None, None
-    return train_set, val_set, test_set, dic
+
+    os.mkdir(args.load_data)
+
+    dic_path = os.path.join(args.load_data, 'dictionary')
+    out_path = args.load_data
+
+    with open(dic_path, 'rb') as f:
+        dic = pickle.load(f)
+
+    with open(os.path.join(out_path, 'train_set'), 'rb') as f:
+        padded_train = pickle.load(f)
+
+    with open(os.path.join(out_path, 'valid_set'), 'rb') as f:
+        padded_valid = pickle.load(f)
+
+    with open(os.path.join(out_path, 'test_set'), 'rb') as f:
+        padded_test = pickle.load(f)
+
+    print('Train size:', len(padded_train))
+    print('Valid size:', len(padded_valid))
+    print('Test size:', len(padded_test))
+
+    return padded_train, padded_valid, padded_test, dic
 
 
 def validate(val_set, model, args):
