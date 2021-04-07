@@ -230,6 +230,8 @@ def main():
     optimizer = optim.Adam(params=model.parameters(), lr=0.01)
     criterion = nn.NLLLoss()
 
+    args.start_epoch = 0
+
     if args.resume:
         if os.path.isfile(args.resume):
             print("=> loading checkpoint '{}'".format(args.resume))
