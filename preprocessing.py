@@ -159,7 +159,7 @@ def read_files(stories_path, tokenized_path):
 
     return articles, summaries, dic
 
-#data path is train_all.txt or valid_all.txt or test_all.txt
+
 def prepare_train_art_sum(train_path, dic_out_path, train_out_path):
     
     articles_idx = []
