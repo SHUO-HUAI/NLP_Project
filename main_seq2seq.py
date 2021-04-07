@@ -152,6 +152,8 @@ def train(train_set, model, criterion, optimizer, epoch, dic, args):
         padded_articles = cur_batch[:, 0]
         padded_summaries = cur_batch[:, 1]
 
+        print(padded_articles)
+
         tensor_art = torch.LongTensor(padded_articles.astype(float))
         tensor_sum = torch.LongTensor(padded_summaries.astype(float))
 
