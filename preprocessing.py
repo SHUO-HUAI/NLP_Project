@@ -223,13 +223,13 @@ def prepare_train_art_sum(train_path, dic_out_path, out_path):
 
         padded_train = np.transpose(np.array([padded_articles, padded_summaries], dtype=object))
 
-        with open(dic_out_path, 'wb') as output:
+        with open(dic_out_path, 'wb+') as output:
             pickle.dump(dic, output, pickle.HIGHEST_PROTOCOL)
 
         if not os.path.exists(out_path):
             os.mkdir(out_path)
 
-        with open(out_path + 'train_set', 'wb') as output:
+        with open(out_path + 'train_set', 'wb+') as output:
             pickle.dump(padded_train, output, pickle.HIGHEST_PROTOCOL)
 
     return dic
@@ -320,7 +320,7 @@ def prepare_valid_art_sum(valid_path, out_path, dic):
 
         padded_valid = np.transpose(np.array([padded_articles, padded_summaries], dtype=object))
 
-        with open(out_path, 'wb') as output:
+        with open(out_path, 'wb+') as output:
             pickle.dump(padded_valid, output, pickle.HIGHEST_PROTOCOL)
 
 
