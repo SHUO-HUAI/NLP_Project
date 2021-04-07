@@ -102,8 +102,8 @@ def validate(val_set, model, args):
             padded_articles = cur_batch[:, 0]
             padded_summaries = cur_batch[:, 1]
 
-            tensor_art = torch.LongTensor(padded_articles)
-            tensor_sum = torch.LongTensor(padded_summaries)
+            tensor_art = torch.LongTensor(padded_articles.astype(float))
+            tensor_sum = torch.LongTensor(padded_summaries.astype(float))
 
             tensor_art = to_cuda(tensor_art)
             tensor_sum = to_cuda(tensor_sum)
@@ -152,8 +152,8 @@ def train(train_set, model, criterion, optimizer, epoch, dic, args):
         padded_articles = cur_batch[:, 0]
         padded_summaries = cur_batch[:, 1]
 
-        tensor_art = torch.LongTensor(padded_articles)
-        tensor_sum = torch.LongTensor(padded_summaries)
+        tensor_art = torch.LongTensor(padded_articles.astype(float))
+        tensor_sum = torch.LongTensor(padded_summaries.astype(float))
 
         tensor_art = to_cuda(tensor_art)
         tensor_sum = to_cuda(tensor_sum)
