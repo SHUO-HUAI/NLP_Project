@@ -132,7 +132,7 @@ class Model(nn.Module):
 
             p_gen = torch.sigmoid(self.wh(context) + self.ws(state.squeeze()) + self.wx(embedded_target))  # [b]
 
-            p_copy = torch.ones((p_gen.size(0), 1)) - p_gen
+            p_copy = to_cuda(torch.ones((p_gen.size(0), 1))) - p_gen
 
             # print(p_gen.shape)
             # print(p_vocab.shape)
@@ -147,7 +147,7 @@ class Model(nn.Module):
 
             # print(inputs[0][0])
 
-            p_w = torch.zeros((p_gen.size(0), p_len))
+            p_w = to_cuda(torch.zeros((p_gen.size(0), p_len)))
 
             p_gen = p_gen.view(-1)
             p_copy = p_copy.view(-1)
