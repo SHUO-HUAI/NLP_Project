@@ -33,6 +33,10 @@ parser.add_argument('--resume', type=str, default=config.resume, help='path to t
 parser.add_argument('--epoch', type=int, default=config.epoch, help='path to the resume checkpoint')
 parser.add_argument('--save', type=str, default=config.save, help='path to the resume checkpoint')
 parser.add_argument('--batch_size', type=int, default=config.batch_size, help='path to the resume checkpoint')
+parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',
+                    help='evaluate model on validation set')
+parser.add_argument('-t', '--test', dest='test', action='store_true',
+                    help='evaluate model on validation set')
 
 best_acc1 = 0.0
 
