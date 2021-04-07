@@ -208,9 +208,9 @@ def main():
 
     articles_len = len(train_set[0][0])
 
-    print(train_set.shape())
-    print(val_set.shape())
-    print(test_set.shape())
+    print(train_set.shape)
+    print(val_set.shape)
+    print(test_set.shape)
 
     print(articles_len)
     exit()
