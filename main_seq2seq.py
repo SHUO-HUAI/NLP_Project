@@ -209,6 +209,9 @@ def main():
 
     articles_len = len(train_set[0][0])
 
+    print(articles_len)
+    exit()
+
     # Model
     model = Model(dic, articles_len)
     model = to_cuda(model)
