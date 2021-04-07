@@ -208,16 +208,16 @@ def main():
 
     articles_len = len(train_set[0][0])
 
-    print(train_set.shape)
-    print(val_set.shape)
-    print(test_set.shape)
-
-    print(len(train_set[0][0]),len(val_set[0][0]),len(test_set[0][0]))
-
-    print(train_set[0])
-
-    print(articles_len)
-    exit()
+    # print(train_set.shape)
+    # print(val_set.shape)
+    # print(test_set.shape)
+    #
+    # print(len(train_set[0][0]),len(val_set[0][0]),len(test_set[0][0]))
+    #
+    # print(train_set[0])
+    #
+    # print(articles_len)
+    # exit()
 
     # Model
     model = Model(dic)
