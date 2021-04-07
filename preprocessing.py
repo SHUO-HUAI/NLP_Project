@@ -168,6 +168,8 @@ def prepare_train_art_sum(train_path, dic_out_path, out_path):
 
     with open(train_path, 'r', encoding="utf8") as f:
         for art_name in f:
+            print(art_name)
+            exit()
             with open(art_name.rstrip(), 'r', encoding="utf8") as art_file:
 
                 highlight_flag = False

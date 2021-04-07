@@ -206,21 +206,21 @@ def main():
     # train_set = [[train_art1, train_sum1],[train_art2, train_sum2], ...] and val_set, test_set
     train_set, val_set, test_set, dic = data_loader(args)
 
-    articles_len = len(train_set[0][0])
+    # articles_len = len(train_set[0][0])
 
-    print(train_set.shape)
-    print(val_set.shape)
-    print(test_set.shape)
-
-    print(len(train_set[0][0]),len(val_set[0][0]),len(test_set[0][0]))
-
-    print(train_set[0])
-
-    print(articles_len)
-    exit()
+    # print(train_set.shape)
+    # print(val_set.shape)
+    # print(test_set.shape)
+    #
+    # print(len(train_set[0][0]),len(val_set[0][0]),len(test_set[0][0]))
+    #
+    # print(train_set[0])
+    #
+    # print(articles_len)
+    # exit()
 
     # Model
-    model = Model(dic, articles_len)
+    model = Model(dic)
     model = to_cuda(model)
 
     optimizer = optim.Adam(params=model.parameters(), lr=0.01)
