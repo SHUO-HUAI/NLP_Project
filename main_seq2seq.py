@@ -253,7 +253,7 @@ def main():
     for epoch in range(args.start_epoch, args.epochs):
         # adjust learning rate ?????
         train(train_set, model, criterion, optimizer, epoch, dic, args)
-        acc1 = validate(val_set, model, criterion, args)
+        acc1 = validate(val_set, model, args)
         is_best = acc1 > best_acc1
         best_acc1 = max(acc1, best_acc1)
 
