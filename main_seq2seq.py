@@ -15,11 +15,11 @@ from collections import Counter
 from torch.autograd import Variable
 import time
 from classes import Dictionary
-import model
+# import model
 from functions import to_cuda
 from preprocessing import read_files, prepare_data, prepare_summary, zero_pad, remove_pad, prepare_train_art_sum, \
     prepare_valid_art_sum
-from model_all import Model
+from model import Model
 import config
 import shutil
 from rouge import Rouge
@@ -111,7 +111,7 @@ def validate(val_set, model, args):
             tensor_art = to_cuda(tensor_art)
             tensor_sum = to_cuda(tensor_sum)
 
-            out_list, _ = model(tensor_art, tensor_sum)
+            out_list, _ = model(tensor_art, tensor_sum, False)
 
             output_list = []
             target_list = []

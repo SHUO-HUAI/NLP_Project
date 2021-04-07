@@ -45,18 +45,18 @@ class Model(nn.Module):
         input_len = inputs.size(-1)  # max input sequence length
         target_len = target.size(-1)  # max target sequence length
 
-        inputs = inputs.view(-1, input_len)
-        # If I pass only 1 article and 1 summary I add one dimension at the
-        # beginning (useful for test)
-        target = target.view(-1, target_len)
+        # inputs = inputs.view(-1, input_len)
+        # # If I pass only 1 article and 1 summary I add one dimension at the
+        # # beginning (useful for test)
+        # target = target.view(-1, target_len)
         
         unked_inputs = get_unked(inputs, self.dictionary)
 
         batch_size = inputs.size(0)
 
-        inputs = to_cuda(inputs)
+        # inputs = to_cuda(inputs)
         unked_inputs = to_cuda(unked_inputs)
-        target = to_cuda(target)
+        # target = to_cuda(target)
 
         # print('Input shape:',inputs.shape)  # Size [b x input_len]
 
@@ -144,12 +144,12 @@ class Model(nn.Module):
             
             p_gen = p_gen.view(-1)
             
-            p_copy = torch.tensor(1) - p_gen  # p_gen has shape [1,1] so doing [0][0] we get the raw number
+            p_copy = to_cuda(torch.tensor(1)) - p_gen  # p_gen has shape [1,1] so doing [0][0] we get the raw number
             
             p_oov = []
             
             
-            p_expanded_vocab = torch.zeros([batch_size,self.word_count + self.max_oovs])
+            p_expanded_vocab = to_cuda(torch.zeros([batch_size,self.word_count + self.max_oovs]))
             p_expanded_vocab += 1/self.word_count/100
             #print(p_expanded_vocab.shape)
             
@@ -158,7 +158,7 @@ class Model(nn.Module):
             attn_idx = 0
             for word in inputs.view(-1,batch_size):
             
-                tmp = torch.zeros(p_expanded_vocab.shape)
+                tmp = to_cuda(torch.zeros(p_expanded_vocab.shape))
                 tmp.scatter_(1,word.view(-1,1),(p_copy*attn[:,attn_idx]).view(-1,1))
                 p_expanded_vocab += tmp
                     
