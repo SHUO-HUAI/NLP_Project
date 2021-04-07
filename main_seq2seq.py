@@ -102,6 +102,9 @@ def validate(val_set, model, args):
             padded_articles = cur_batch[:, 0]
             padded_summaries = cur_batch[:, 1]
 
+            padded_articles = np.array([np.array(tmp) for tmp in padded_articles])
+            padded_summaries = np.array([np.array(tmp) for tmp in padded_summaries])
+
             tensor_art = torch.LongTensor(padded_articles.astype(np.float32))
             tensor_sum = torch.LongTensor(padded_summaries.astype(np.float32))
 
@@ -155,9 +158,9 @@ def train(train_set, model, criterion, optimizer, epoch, dic, args):
         padded_articles = np.array([np.array(tmp) for tmp in padded_articles])
         padded_summaries = np.array([np.array(tmp) for tmp in padded_summaries])
 
-        print(padded_articles)
-        for i in padded_articles:
-            print(len(i))
+        # print(padded_articles)
+        # for i in padded_articles:
+        #     print(len(i))
 
         tensor_art = torch.LongTensor(padded_articles.astype(np.float32))
         tensor_sum = torch.LongTensor(padded_summaries.astype(np.float32))
