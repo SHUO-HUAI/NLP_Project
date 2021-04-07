@@ -151,3 +151,5 @@ crashlytics-build.properties
 fabric.properties
 /data_all_token/
 /data_all_token/*
+/data_finished/
+/data_finished/*
