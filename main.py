@@ -18,7 +18,7 @@ import preprocessing
 import model
 import functions
 from functions import to_cuda
-from preprocessing import read_files, prepare_data, prepare_summary, zero_pad, remove_pad, get_unked, prepare_train_art_sum
+from preprocessing import read_files, prepare_data, prepare_summary, zero_pad, remove_pad, get_unked, prepare_train_art_sum, prepare_valid_art_sum
 from model import Model
 import pickle
 import config
@@ -52,23 +52,41 @@ sum_idx = prepare_summary(summaries, dic)
 
 #prepare TRAIN
 train_path = 'train_all.txt'
+valid_path = 'val_all.txt'
+test_path = 'test_all.txt'
 dic_path = 'dictionary'
-train_out_path = 'data_finish/train/'
-prepare_train_art_sum(train_path, dic_path, train_out_path)
+out_path = 'data_finish/'
 
-vocab = Dictionary()
+prepare_train_art_sum(train_path, dic_path, out_path)
+
+dic = Dictionary()
 with open(dic_path, 'rb') as input:
-    vocab = pickle.load(input)
+    dic = pickle.load(input)
     
-with open(train_out_path+'articles', 'rb') as input:
-    padded_articles = pickle.load(input)
     
-with open(train_out_path+'summaries', 'rb') as input:
-    padded_summaries = pickle.load(input)
+with open(out_path+'train_set', 'rb') as input:
+    padded_train = pickle.load(input)
 
 
-print('Length of padded articles:', len(padded_articles[0]))
-print('Length of padded summaries:', len(padded_summaries[0]))
+prepare_valid_art_sum(valid_path, out_path+'valid_set', dic)
+
+with open(out_path+'valid_set', 'rb') as input:
+    padded_valid = pickle.load(input)
+    
+
+prepare_valid_art_sum(test_path, out_path+'test_set', dic)
+    
+with open(out_path+'test_set', 'rb') as input:
+    padded_test = pickle.load(input)
+    
+
+print('Train size:',len(padded_train))
+print('Valid size:',len(padded_valid))
+print('Test size:',len(padded_test))
+
+exit()
+#FROM NOW ON ITS DIFFERENT
+
 
 tensor_art = torch.LongTensor(padded_articles)
 tensor_sum = torch.LongTensor(padded_summaries)
