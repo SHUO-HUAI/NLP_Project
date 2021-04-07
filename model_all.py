@@ -57,7 +57,6 @@ class Model(nn.Module):
         target = to_cuda(target)
         unked_inputs = to_cuda(unked_inputs)
 
-
         # print('Input shape:',inputs.shape)  # Size [b x input_len]
 
         embedded_inputs = self.embed(unked_inputs)  # Size [b x input_len x emb_dim]

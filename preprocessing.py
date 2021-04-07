@@ -125,19 +125,19 @@ def tokenize_stories(stories_dir, tokenized_stories_dir):
 #     return articles, summaries, dic
 
 
-def read_files(stories_path, tokenized_path):
+def read_files(tokenized_path):
     if type(tokenized_path) is not list:
-        stories_path = [stories_path]
+        # stories_path = [stories_path]
         tokenized_path = [tokenized_path]
     dic = Dictionary()
     articles = []
     summaries = []
 
     for i in range(len(tokenized_path)):
-        need_token = not os.path.exists(tokenized_path[i])
-        if need_token:
-            os.mkdir(tokenized_path[i])
-            tokenize_stories(stories_path[i], tokenized_path[i])
+        # need_token = not os.path.exists(tokenized_path[i])
+        # if need_token:
+        #     os.mkdir(tokenized_path[i])
+        #     tokenize_stories(stories_path[i], tokenized_path[i])
 
         stories = os.listdir(tokenized_path[i])
         for story in stories:
