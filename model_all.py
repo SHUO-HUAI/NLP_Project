@@ -78,8 +78,13 @@ class Model(nn.Module):
         # print(self.dictionary.idx2word[next_input])    # <SOS>
 
         out_list = []  # Output list
+        print(target_len)
+        print(self.dic.shape)
 
         for i in range(target_len - 1):
+            print(i)
+            torch.cuda.synchronize()
+            end = time.time()
 
             embedded_target = self.embed(next_input)  # size [b x emb_dim]
 
@@ -192,6 +197,9 @@ class Model(nn.Module):
 
             else:
                 next_input = to_cuda(out)
+
+            torch.cuda.synchronize()
+            print('time cost:', time.time() - end)
 
         # print('Out_List:', out_list)
         out_list = torch.stack(out_list, 1)
