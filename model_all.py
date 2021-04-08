@@ -57,20 +57,20 @@ class Model(nn.Module):
         # target = to_cuda(target)
         unked_inputs = to_cuda(unked_inputs)
 
-        # print('Input shape:',inputs.shape)  # Size [b x input_len]
+        print('Input shape:', inputs.shape)  # Size [b x input_len]
 
         embedded_inputs = self.embed(unked_inputs)  # Size [b x input_len x emb_dim]
-        # print('Embeddings shape:',embedded_inputs.shape)
+        print('Embeddings shape:', embedded_inputs.shape)
 
         encoded, _ = self.encoder(embedded_inputs)  # Size [b x input_len x 2*hidden_dim] hi
-        # print('Encoded shape:',encoded.shape)
+        print('Encoded shape:', encoded.shape)
 
         # print('Coverage shape:',coverage.shape)
 
         coverage = np.zeros(inputs.shape, np.long)  # Coverage has size (b x seq_length)
         coverage = torch.Tensor(coverage)
         coverage = to_cuda(coverage)
-        # print('Coverage shape:',coverage.shape)
+        print('Coverage shape:', coverage.shape)
 
         cov_loss = 0
 
