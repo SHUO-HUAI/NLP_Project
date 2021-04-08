@@ -134,8 +134,8 @@ class Model(nn.Module):
 
             p_copy = to_cuda(torch.ones((p_gen.size(0), 1))) - p_gen
 
-            # print(p_gen.shape)
-            # print(p_vocab.shape)
+            print(p_gen.shape)
+            print(p_vocab.shape)
 
             # print(p_gen)
             # print(p_copy)
@@ -151,7 +151,7 @@ class Model(nn.Module):
 
             p_gen = p_gen.view(-1)
             p_copy = p_copy.view(-1)
-            # print(p_gen)
+            print(p_gen)
 
             for ind_tmp in range(p_len):
                 # print(inputs == ind_tmp)
