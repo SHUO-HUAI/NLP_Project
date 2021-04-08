@@ -157,14 +157,23 @@ class Model(nn.Module):
             for ind_tmp in range(p_len):
                 # print(inputs == ind_tmp)
                 # exit()
+                tmp_1 = (inputs == ind_tmp)
+                tmp_2 = attn * tmp_1
+                del tmp_1
+                tmp_3 = tmp_2.sum(1)
+                del tmp_2
+
                 if ind_tmp < p_vocab.size(1):
                     # print(p_gen)
                     # print((p_gen * p_vocab[:, ind_tmp]).shape)
                     # print((attn * (inputs == ind_tmp)).shape)
                     # print(((attn * (inputs == ind_tmp)).sum(1)))
-                    p_w[:, ind_tmp] = p_gen * p_vocab[:, ind_tmp] + p_copy * ((attn * (inputs == ind_tmp)).sum(1))
+
+                    p_w[:, ind_tmp] = p_gen * p_vocab[:, ind_tmp] + p_copy * tmp_3
                 else:
-                    p_w[:, ind_tmp] = p_copy * ((attn * (inputs == ind_tmp)).sum(1))
+                    p_w[:, ind_tmp] = p_copy * tmp_3
+
+                del tmp_3
 
             # exit()
 
