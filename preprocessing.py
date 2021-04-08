@@ -165,6 +165,7 @@ def prepare_train_art_sum(train_path, dic_out_path, out_path):
     summaries_idx = []
 
     dic = Dictionary()
+    i = 0
 
     with open(train_path, 'r', encoding="utf8") as f:
         for art_name in f:
@@ -190,6 +191,10 @@ def prepare_train_art_sum(train_path, dic_out_path, out_path):
 
             articles_idx.append(art_idx)
             summaries_idx.append(sum_idx)
+
+            if i > 50000:
+                break
+            i = i + 1
 
         padded_articles = zero_pad(articles_idx)
         padded_summaries = zero_pad(summaries_idx)

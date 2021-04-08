@@ -49,7 +49,7 @@ class Model(nn.Module):
         # # If I pass only 1 article and 1 summary I add one dimension at the
         # # beginning (useful for test)
         # target = target.view(-1, target_len)
-        
+
         unked_inputs = get_unked(inputs, self.dictionary)
 
         batch_size = inputs.size(0)
@@ -75,13 +75,12 @@ class Model(nn.Module):
 
         if train:
             next_input = to_cuda(target[:, 0])  # First word of summary (should be <SOS>)
-        
+
         else:
             next_input = self.dictionary.word2idx['<SOS>']
-        
 
         out_list = []  # Output list
-        
+
         for i in range(target_len - 1):
             print(i)
 
@@ -121,7 +120,7 @@ class Model(nn.Module):
 
             # Depends on context vector, state of decoder, and input of decoder (embedded_target)
             p_gen = torch.sigmoid(self.wh(context) + self.ws(state.squeeze()) + self.wx(embedded_target))  # [b]
-    
+
             # Coverage loss (better pay attention on less covered words)
             cov_loss += torch.sum(torch.min(attn.clone(), coverage.clone()))
 
@@ -134,58 +133,52 @@ class Model(nn.Module):
             v2_out = self.V2(self.V1(cat))
 
             p_vocab = F.softmax(v2_out, dim=1)  # Shape [b x vocab]
-            #p_vocab = v2_out
-            
-            #print(attn.shape)
-            
+            # p_vocab = v2_out
+
+            # print(attn.shape)
+
             # ... PROBABILITY OF COPYING HERE ...
             # ... PROBABILITY OF COPYING HERE ...
-            
-            
-            
+
             p_gen = p_gen.view(-1)
-            
+
             p_copy = to_cuda(torch.tensor(1)) - p_gen  # p_gen has shape [1,1] so doing [0][0] we get the raw number
-            
+
             p_oov = []
-            
-            
-            p_expanded_vocab = to_cuda(torch.zeros([batch_size,self.word_count + self.max_oovs]))
-            p_expanded_vocab += 1/self.word_count/100
-            #print(p_expanded_vocab.shape)
-            
-            p_expanded_vocab[:,:self.word_count] += p_vocab*p_gen.view(-1,1).repeat([1,p_vocab.shape[1]])
-            
+
+            p_expanded_vocab = to_cuda(torch.zeros([batch_size, self.word_count + self.max_oovs]))
+            p_expanded_vocab += 1 / self.word_count / 100
+            # print(p_expanded_vocab.shape)
+
+            p_expanded_vocab[:, :self.word_count] += p_vocab * p_gen.view(-1, 1).repeat([1, p_vocab.shape[1]])
+
             attn_idx = 0
-            for word in inputs.view(-1,batch_size):
-            
+            for word in inputs.view(-1, batch_size):
                 tmp = to_cuda(torch.zeros(p_expanded_vocab.shape))
-                tmp.scatter_(1,word.view(-1,1),(p_copy*attn[:,attn_idx]).view(-1,1))
+                tmp.scatter_(1, word.view(-1, 1), (p_copy * attn[:, attn_idx]).view(-1, 1))
                 p_expanded_vocab += tmp
-                    
-                #else:
-                    #p_expanded_vocab[b][word.item()] += p_gen*attn[b][attn_idx]
-                    #pass
-                        
+
+                # else:
+                # p_expanded_vocab[b][word.item()] += p_gen*attn[b][attn_idx]
+                # pass
+
                 attn_idx += 1
-                    
-            
-            #p_vocab += 1/self.word_count
-            #p_expanded_vocab = F.softmax(p_expanded_vocab, dim=1)
-    
-            #print(p_oov)
-            #time.sleep(10)
-    
+
+            # p_vocab += 1/self.word_count
+            # p_expanded_vocab = F.softmax(p_expanded_vocab, dim=1)
+
+            # print(p_oov)
+            # time.sleep(10)
+
             # ... PROBABILITY OF COPYING HERE ...
             # ... PROBABILITY OF COPYING HERE ...
-            
-            
+
             out = p_expanded_vocab.max(1)[1]  # .squeeze()
 
             # out_list.append(out)
             out_list.append(p_expanded_vocab)
-            #print(p_expanded_vocab.shape)
-            #time.sleep(10)
+            # print(p_expanded_vocab.shape)
+            # time.sleep(10)
 
             if train:
                 next_input = to_cuda(target[:, i + 1])
