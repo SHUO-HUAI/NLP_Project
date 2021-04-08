@@ -159,7 +159,7 @@ class Model(nn.Module):
                 if ind_tmp < p_vocab.size(1):
                     # print(p_gen)
                     # print((p_gen * p_vocab[:, ind_tmp]).shape)
-                    # print((attn * (inputs == ind_tmp)).shape)
+                    print((attn * (inputs == ind_tmp)).shape)
                     # print(((attn * (inputs == ind_tmp)).sum(1)))
                     p_w[:, ind_tmp] = p_gen * p_vocab[:, ind_tmp] + p_copy * ((attn * (inputs == ind_tmp)).sum(1))
                 else:
