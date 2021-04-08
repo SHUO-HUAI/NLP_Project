@@ -12,7 +12,7 @@ from functions import to_cuda
 
 
 class Model(nn.Module):
-    def __init__(self, dic, emb_dim=128, hidden_dim=256, max_enc=3000, max_oovs=100):
+    def __init__(self, dic, emb_dim=128, hidden_dim=256, max_enc=2223, max_oovs=100):
         super(Model, self).__init__()
 
         self.vocab_size = len(dic.idx2word)
@@ -102,7 +102,7 @@ class Model(nn.Module):
             elapsed = time.time()
             diff = elapsed - start
             print("3-1: ", diff)
-            time.sleep(5)
+            # time.sleep(5)
             start = time.time()
             # 3.2. get hidden state from previous hidden state and current decoder input
             if i == 0:
@@ -125,7 +125,7 @@ class Model(nn.Module):
             elapsed = time.time()
             diff = elapsed - start
             print("3-2,3: ", diff)
-            time.sleep(5)
+            # time.sleep(5)
             start = time.time()
 
             # 3.4. get context vector from encoder_out and attention
@@ -144,7 +144,7 @@ class Model(nn.Module):
             elapsed = time.time()
             diff = elapsed - start
             print("3-4,5,6,7: ", diff)
-            time.sleep(5)
+            # time.sleep(5)
             start = time.time()
 
             # 3.8. get output vector by adding the two vectors
@@ -168,7 +168,7 @@ class Model(nn.Module):
             elapsed = time.time()
             diff = elapsed - start
             print("3-8.2: ", diff)
-            time.sleep(5)
+            # time.sleep(5)
             start = time.time()
             # 3.8.3. add all duplicate attns to a distinct matrix
             for dup in dup_list:
@@ -185,7 +185,7 @@ class Model(nn.Module):
             elapsed = time.time()
             diff = elapsed - start
             print("3-8.3: ", diff)
-            time.sleep(5)
+            # time.sleep(5)
             start = time.time()
             # 3.8.4.
             attn = torch.mul(attn, (1 - masked_idx_sum)) + dup_attn_sum
@@ -200,7 +200,7 @@ class Model(nn.Module):
             elapsed = time.time()
             diff = elapsed - start
             print("3-8.4: ", diff)
-            time.sleep(5)
+            # time.sleep(5)
             start = time.time()
 
             # en = torch.LongTensor(input) # [b x in_seq]
@@ -224,7 +224,7 @@ class Model(nn.Module):
             elapsed = time.time()
             diff = elapsed - start
             print("3-9: ", diff)
-            time.sleep(5)
+            # time.sleep(5)
             start = time.time()
 
             # 3.10. get next input
