@@ -83,6 +83,7 @@ class Model(nn.Module):
         out_list = []  # Output list
         
         for i in range(target_len - 1):
+            print(i)
 
             embedded_target = self.embed(next_input)  # size [b x emb_dim]
 
