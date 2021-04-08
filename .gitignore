@@ -153,3 +153,5 @@ fabric.properties
 /data_all_token/*
 /data_finished/
 /data_finished/*
+/data_finished_small/
+/data_finished_small/*
