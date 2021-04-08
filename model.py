@@ -81,7 +81,7 @@ class Model(nn.Module):
 
         out_list = []  # Output list
         print(target_len)
-        print(self.dictionary.__len__)
+        print(len(self.dictionary.idx2word))
         for i in range(target_len - 1):
             print(i)
             torch.cuda.synchronize()
