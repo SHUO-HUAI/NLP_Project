@@ -174,13 +174,13 @@ class Model(nn.Module):
             for dup in dup_list:
                 mask = np.array(input == dup, dtype=float)
                 masked_idx_sum += mask
-                attn_mask = torch.mul(Variable(torch.Tensor(mask)).cuda(), attn)
+                attn_mask = torch.mul(to_cuda(Variable(torch.Tensor(mask))), attn)
                 attn_sum = attn_mask.sum(1).unsqueeze(1)  # [b x 1]
                 # print(attn_mask)
                 # print(attn_sum)
                 # print(dup_attn_sum)
                 dup_attn_sum += torch.mul(attn_mask, attn_sum)
-            masked_idx_sum = Variable(torch.Tensor(masked_idx_sum).cuda())
+            masked_idx_sum = Variable(to_cuda(torch.Tensor(masked_idx_sum)))
 
             elapsed = time.time()
             diff = elapsed - start
