@@ -20,7 +20,7 @@ class Model(nn.Module):
         self.embed_size = emb_dim
         self.max_enc = max_enc
         self.max_oovs = max_oovs
-        self.dictonary = dic
+        self.dictionary = dic
 
         self.embed = nn.Embedding(self.vocab_size, self.embed_size)
         # words 0,1,2,3 stand for zeropad, SOS, EOS, UNK
