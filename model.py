@@ -66,15 +66,16 @@ class Model(nn.Module):
         encoded, _ = self.encoder(embedded_inputs)  # Size [b x input_len x 2*hidden_dim]
         # print('Encoded shape:',encoded.shape)
 
-        coverage = np.zeros(inputs.shape, np.long)  # Coverage has size (b x seq_length)
-        coverage = torch.Tensor(coverage)
+        # coverage = np.zeros(inputs.shape, np.long)  # Coverage has size (b x seq_length)
+        coverage = torch.zeros(inputs.shape)
+        # coverage = torch.Tensor(coverage)
         coverage = to_cuda(coverage)
         # print('Coverage shape:',coverage.shape)
 
         cov_loss = 0
 
         if train:
-            next_input = to_cuda(target[:, 0])  # First word of summary (should be <SOS>)
+            next_input = target[:, 0] # First word of summary (should be <SOS>)
 
         else:
             next_input = self.dictionary.word2idx['<SOS>']
@@ -147,13 +148,17 @@ class Model(nn.Module):
 
             p_copy = to_cuda(torch.tensor(1)) - p_gen  # p_gen has shape [1,1] so doing [0][0] we get the raw number
 
-            p_oov = []
+            # p_oov = []
 
             p_expanded_vocab = to_cuda(torch.zeros([batch_size, self.word_count + self.max_oovs]))
             p_expanded_vocab += 1 / self.word_count / 100
             # print(p_expanded_vocab.shape)
 
             p_expanded_vocab[:, :self.word_count] += p_vocab * p_gen.view(-1, 1).repeat([1, p_vocab.shape[1]])
+
+            torch.cuda.synchronize()
+            print('time cost tmp1:', time.time() - end)
+            end = time.time()
 
             attn_idx = 0
             for word in inputs.view(-1, batch_size):
@@ -184,13 +189,13 @@ class Model(nn.Module):
             # time.sleep(10)
 
             if train:
-                next_input = to_cuda(target[:, i + 1])
+                next_input = target[:, i + 1]
                 # print(self.dictionary.idx2word[next_input])
 
             else:
-                next_input = to_cuda(out)
+                next_input = out
             torch.cuda.synchronize()
-            print('time cost:', time.time() - end)
+            print('time cost tmp2:', time.time() - end)
         # print('Out_List:', out_list)
         out_list = torch.stack(out_list, 1)
         # print('Out_List:', out_list)
