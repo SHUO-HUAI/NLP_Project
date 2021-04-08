@@ -12,7 +12,7 @@ from functions import to_cuda
 
 
 class Model(nn.Module):
-    def __init__(self, dic, emb_dim=128, hidden_dim=256, max_enc=2223, max_oovs=100):
+    def __init__(self, dic, emb_dim=128, hidden_dim=256, max_enc=2127, max_oovs=100):
         super(Model, self).__init__()
 
         self.vocab_size = len(dic.idx2word)
