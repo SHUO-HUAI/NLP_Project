@@ -192,7 +192,7 @@ def prepare_train_art_sum(train_path, dic_out_path, out_path):
             articles_idx.append(art_idx)
             summaries_idx.append(sum_idx)
 
-            if i > 10000:
+            if i > 1000:
                 break
             i = i + 1
 
