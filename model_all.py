@@ -143,8 +143,9 @@ class Model(nn.Module):
             # print(inputs.max())
 
             p_len = max(inputs.max(), p_vocab.size(1))
-            # print(p_len)
-
+            print(p_len)
+            print(inputs.max())
+            print(p_vocab.size(1))
             # print(inputs[0][0])
 
             p_w = to_cuda(torch.zeros((p_gen.size(0), p_len)))
@@ -159,7 +160,7 @@ class Model(nn.Module):
                 if ind_tmp < p_vocab.size(1):
                     # print(p_gen)
                     # print((p_gen * p_vocab[:, ind_tmp]).shape)
-                    print((attn * (inputs == ind_tmp)).shape)
+                    # print((attn * (inputs == ind_tmp)).shape)
                     # print(((attn * (inputs == ind_tmp)).sum(1)))
                     p_w[:, ind_tmp] = p_gen * p_vocab[:, ind_tmp] + p_copy * ((attn * (inputs == ind_tmp)).sum(1))
                 else:
