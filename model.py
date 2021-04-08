@@ -51,11 +51,13 @@ class Model(nn.Module):
         # target = target.view(-1, target_len)
 
         unked_inputs = get_unked(inputs, self.dictionary)
+        unked_target = get_unked(target, self.dictionary)
 
         batch_size = inputs.size(0)
 
         # inputs = to_cuda(inputs)
         unked_inputs = to_cuda(unked_inputs)
+        unked_target = to_cuda(unked_target)
         # target = to_cuda(target)
 
         # print('Input shape:',inputs.shape)  # Size [b x input_len]
