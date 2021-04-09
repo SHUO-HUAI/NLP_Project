@@ -18,7 +18,7 @@ import preprocessing
 import model
 import functions
 from functions import to_cuda
-from preprocessing import read_files, prepare_data, prepare_summary, zero_pad, remove_pad, get_unked, prepare_train_art_sum, prepare_valid_art_sum
+from preprocessing import read_files, prepare_data, prepare_summary, zero_pad, remove_pad, get_unked, prepare_train_art_sum, prepare_art_sum, prepare_dictionary
 from model import Model
 import pickle
 import config
@@ -57,24 +57,30 @@ test_path = 'test_all.txt'
 dic_path = 'dictionary'
 out_path = 'data_finish/'
 
-prepare_train_art_sum(train_path, dic_path, out_path)
+prepare_dictionary(train_path, dic_path)
 
 dic = Dictionary()
+
 with open(dic_path, 'rb') as input:
     dic = pickle.load(input)
-    
+
+print(len(dic.word2idx))
+
+#exit()
+
+prepare_art_sum(train_path, out_path+'train_set', dic)
     
 with open(out_path+'train_set', 'rb') as input:
     padded_train = pickle.load(input)
 
 
-prepare_valid_art_sum(valid_path, out_path+'valid_set', dic)
+prepare_art_sum(valid_path, out_path+'valid_set', dic)
 
 with open(out_path+'valid_set', 'rb') as input:
     padded_valid = pickle.load(input)
     
 
-prepare_valid_art_sum(test_path, out_path+'test_set', dic)
+prepare_art_sum(test_path, out_path+'test_set', dic)
     
 with open(out_path+'test_set', 'rb') as input:
     padded_test = pickle.load(input)

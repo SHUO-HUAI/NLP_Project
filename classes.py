@@ -22,3 +22,20 @@ class Dictionary(object):
 
     def __len__(self):
         return len(self.idx2word)
+        
+
+
+class CountDictionary(object):
+    def __init__(self):
+        self.word2count = {}
+
+    def add_word(self, word):
+        # word = word.lower()
+        if word not in self.word2count:
+            self.word2count[word] = 1
+        
+        else:
+            self.word2count[word] += 1
+
+    def __len__(self):
+        return len(self.idx2word)

@@ -8,7 +8,7 @@ import torch
 import classes
 import subprocess
 import pickle
-from classes import Dictionary
+from classes import Dictionary, CountDictionary
 
 # according to https://github.com/abisee/cnn-dailymail/blob/master/make_datafiles.py
 dm_single_close_quote = u'\u2019'  # unicode
@@ -17,6 +17,7 @@ SENTENCE_START = '<SOS>'
 SENTENCE_END = '<EOS>'
 END_TOKENS = ['.', '!', '?', '...', "'", "`", '"', dm_single_close_quote, dm_double_close_quote,
               ")"]  #
+MAX_DIC_LEN = 50000
 
 os.environ['CLASSPATH'] = './stanford-corenlp/stanford-corenlp-4.2.0.jar'
 
@@ -160,6 +161,59 @@ def read_files(stories_path, tokenized_path):
     return articles, summaries, dic
 
 
+def prepare_dictionary(train_path, dic_out_path):
+
+    dic = Dictionary()
+    count_dic = CountDictionary()
+    i = 0
+    
+    
+    with open(train_path, 'r', encoding="utf8") as f:
+        for art_name in f:
+            article, summary = get_art_abs(art_name.strip())
+
+            art_tokens = article.split(' ')
+            art_tokens = [t.strip() for t in art_tokens]  # strip
+            art_tokens = [t for t in art_tokens if t != ""]  # remove empty
+            sum_tokens = summary.split(' ')
+            sum_tokens = [t.strip() for t in sum_tokens]  # strip
+            sum_tokens = [t for t in sum_tokens if t != ""]  # remove empty
+
+
+            for token in art_tokens:
+                count_dic.add_word(token)
+    
+            for token in sum_tokens:
+                count_dic.add_word(token)
+                
+            i += 1
+            if(i==2000):
+                break
+            
+            
+    
+    
+    #print(len(count_dic.word2count))
+    #print(count_dic.word2count)
+            
+    sorted_items = sorted(count_dic.word2count.items(), key=lambda item: item[1], reverse=True)
+    #print(sorted_items[:100])
+    
+    j = 0
+    for word_count in sorted_items:
+        #print(word_count[0])
+        dic.add_word(word_count[0])
+        j+=1
+        if(j == MAX_DIC_LEN):
+            break
+    
+    #print(len(dic.word2idx))
+    
+    with open(dic_out_path, 'wb+') as output:
+        pickle.dump(dic, output, pickle.HIGHEST_PROTOCOL)
+    
+    
+
 def prepare_train_art_sum(train_path, dic_out_path, out_path):
     articles_idx = []
     summaries_idx = []
@@ -189,10 +243,11 @@ def prepare_train_art_sum(train_path, dic_out_path, out_path):
                 dic.add_word(token)
                 sum_idx.append(dic.word2idx[token])
 
+            
             articles_idx.append(art_idx)
             summaries_idx.append(sum_idx)
 
-            if i > 1000:
+            if i > 100:
                 break
             i = i + 1
 
@@ -213,9 +268,13 @@ def prepare_train_art_sum(train_path, dic_out_path, out_path):
     return dic
 
 
-def prepare_valid_art_sum(valid_path, out_path, dic):
+
+
+
+def prepare_art_sum(valid_path, out_path, dic):
     articles_idx = []
     summaries_idx = []
+    i = 0
 
     with open(valid_path, 'r', encoding="utf8") as f:
         for art_name in f:
@@ -264,6 +323,12 @@ def prepare_valid_art_sum(valid_path, out_path, dic):
 
             articles_idx.append(art_idx)
             summaries_idx.append(sum_idx)
+            
+            
+            i = i + 1
+            if i > 1000:
+                break
+            
 
         padded_articles = zero_pad(articles_idx)
         padded_summaries = zero_pad(summaries_idx)
