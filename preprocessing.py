@@ -18,6 +18,8 @@ SENTENCE_END = '<EOS>'
 END_TOKENS = ['.', '!', '?', '...', "'", "`", '"', dm_single_close_quote, dm_double_close_quote,
               ")"]  #
 MAX_DIC_LEN = 50000
+MAX_ART_LEN = 400
+MAX_SUM_LEN = 100
 
 os.environ['CLASSPATH'] = './stanford-corenlp/stanford-corenlp-4.2.0.jar'
 
@@ -235,6 +237,8 @@ def prepare_train_art_sum(train_path, dic_out_path, out_path):
             art_idx = []
             sum_idx = []
 
+            
+
             for token in art_tokens:
                 dic.add_word(token)
                 art_idx.append(dic.word2idx[token])
@@ -271,12 +275,12 @@ def prepare_train_art_sum(train_path, dic_out_path, out_path):
 
 
 
-def prepare_art_sum(valid_path, out_path, dic):
+def prepare_art_sum(path, out_path, dic):
     articles_idx = []
     summaries_idx = []
     i = 0
 
-    with open(valid_path, 'r', encoding="utf8") as f:
+    with open(path, 'r', encoding="utf8") as f:
         for art_name in f:
             article, summary = get_art_abs(art_name.strip())
 
@@ -293,7 +297,11 @@ def prepare_art_sum(valid_path, out_path, dic):
             art_idx = []
             sum_idx = []
 
+            art_len = 0
+            sum_len = 0
+
             for token in art_tokens:
+                
                 if token in dic.word2idx.keys():
                     art_idx.append(dic.word2idx[token])
 
@@ -305,6 +313,10 @@ def prepare_art_sum(valid_path, out_path, dic):
                         art_idx.append(oov_idx)
                         oov_dic[token] = oov_idx
                         oov_idx += 1
+                        
+                art_len+=1
+                if(art_len >= MAX_ART_LEN):
+                    break
 
             for token in sum_tokens:
                 if token in dic.word2idx.keys():
@@ -318,6 +330,10 @@ def prepare_art_sum(valid_path, out_path, dic):
                         sum_idx.append(oov_idx)
                         oov_dic[token] = oov_idx
                         oov_idx += 1
+                        
+                sum_len += 1
+                if(sum_len >= MAX_SUM_LEN):
+                    break
 
             # print(oov_idx)
 
@@ -326,17 +342,19 @@ def prepare_art_sum(valid_path, out_path, dic):
             
             
             i = i + 1
-            if i > 1000:
+            if i > 10000:
                 break
             
-
         padded_articles = zero_pad(articles_idx)
         padded_summaries = zero_pad(summaries_idx)
+        
+        #print(len(padded_articles[0]))
+        #print(len(padded_summaries[0]))
 
-        padded_valid = np.transpose(np.array([padded_articles, padded_summaries], dtype=object))
+        padded_data = np.transpose(np.array([padded_articles, padded_summaries], dtype=object))
 
         with open(out_path, 'wb+') as output:
-            pickle.dump(padded_valid, output, pickle.HIGHEST_PROTOCOL)
+            pickle.dump(padded_data, output, pickle.HIGHEST_PROTOCOL)
 
 
 # Given the articles strings and a dictionary, return the arrays of words converted to indexes
