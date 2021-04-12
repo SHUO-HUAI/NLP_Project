@@ -79,6 +79,7 @@ def data_loader(args):
     print('Valid size:', len(padded_valid))
     print('Test size:', len(padded_test))
     print('Directory size', len((dic.word2idx.keys())))
+    print('Directory size 2', len(dic.word2idx))
 
     return padded_train, padded_valid, padded_test, dic
 
