@@ -334,10 +334,10 @@ def prepare_art_sum(path, out_path, dic):
 
             i = i + 1
             if 'train' in path:
-                if i >= 10000:
+                if i > 10000:
                     break
             else:
-                if i >= 1000:
+                if i > 1000:
                     break
 
         padded_articles = zero_pad(articles_idx)
