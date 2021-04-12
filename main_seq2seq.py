@@ -54,6 +54,7 @@ def data_process(args):
 
     # dic = prepare_train_art_sum(train_path, dic_path, out_path)
     dic = prepare_dictionary(train_path, dic_path)
+    prepare_art_sum(train_path, os.path.join(out_path, 'train_set'), dic)
     prepare_art_sum(valid_path, os.path.join(out_path, 'valid_set'), dic)
     prepare_art_sum(test_path, os.path.join(out_path, 'test_set'), dic)
 
@@ -137,6 +138,7 @@ def train(train_set, model, criterion, optimizer, epoch, args):
     print('Start of Epoch: ', epoch)
     print_count = 0
     end = time.time()
+
 
     np.random.shuffle(train_set)
 
