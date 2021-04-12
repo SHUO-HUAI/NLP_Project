@@ -86,7 +86,7 @@ class Model(nn.Module):
             torch.cuda.synchronize()
             end = time.time()
 
-            print(next_input.shape)
+            # print(next_input.shape)
 
             embedded_target = self.embed(next_input)  # size [b x emb_dim]
 
