@@ -80,13 +80,13 @@ class Model(nn.Module):
         # print(self.dictionary.idx2word[next_input])    # <SOS>
 
         out_list = []  # Output list
-        print(target_len)
-        print(self.dic.shape)
+        # print(target_len)
+        # print(self.dictionary.shape)
 
         for i in range(target_len - 1):
             print('i', i)
-            torch.cuda.synchronize()
-            end = time.time()
+            # torch.cuda.synchronize()
+            # end = time.time()
 
             # print(next_input.shape)
 
@@ -143,8 +143,8 @@ class Model(nn.Module):
 
             p_copy = to_cuda(torch.ones((p_gen.size(0), 1))) - p_gen
 
-            print(p_gen.shape)
-            print(p_vocab.shape)
+            # print(p_gen.shape)
+            # print(p_vocab.shape)
 
             # print(p_gen)
             # print(p_copy)
@@ -152,16 +152,16 @@ class Model(nn.Module):
             # print(inputs.max())
 
             p_len = max(inputs.max(), p_vocab.size(1))
-            print(p_len)
-            print(inputs.max())
-            print(p_vocab.size(1))
+            # print(p_len)
+            # print(inputs.max())
+            # print(p_vocab.size(1))
             # print(inputs[0][0])
 
             p_w = to_cuda(torch.zeros((p_gen.size(0), p_len)))
 
             p_gen = p_gen.view(-1)
             p_copy = p_copy.view(-1)
-            print(p_gen)
+            # print(p_gen)
 
             for ind_tmp in range(p_len):
                 # print(inputs == ind_tmp)
@@ -202,8 +202,8 @@ class Model(nn.Module):
             else:
                 next_input = out
 
-            torch.cuda.synchronize()
-            print('time cost:', time.time() - end)
+            # torch.cuda.synchronize()
+            # print('time cost:', time.time() - end)
 
         # print('Out_List:', out_list)
         out_list = torch.stack(out_list, 1)
