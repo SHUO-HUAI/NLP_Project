@@ -25,7 +25,7 @@ class Model(nn.Module):
         self.dictionary = dic  # Saving the dictionary
         self.max_oovs = max_oovs
 
-        self.embed = nn.Embedding(self.word_count, self.emb_dim)
+        self.embed = nn.Embedding(self.word_count - 4, self.emb_dim)
         self.encoder = nn.LSTM(input_size=self.emb_dim, hidden_size=hidden_dim, batch_first=True, bidirectional=True)
         self.decoder = nn.LSTM(input_size=self.emb_dim, hidden_size=hidden_dim, batch_first=True)
 
