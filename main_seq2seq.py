@@ -243,7 +243,7 @@ def main():
     model = Model(dic)
     model = to_cuda(model)
 
-    optimizer = optim.Adam(params=model.parameters(), lr=0.01)
+    optimizer = optim.Adam(params=model.parameters(), lr=0.3)
     criterion = nn.NLLLoss()
 
     args.start_epoch = 0
