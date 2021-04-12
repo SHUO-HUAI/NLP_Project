@@ -167,7 +167,7 @@ def prepare_dictionary(train_path, dic_out_path):
     dic = Dictionary()
     count_dic = CountDictionary()
     # i = 0
-    print(len(dic.word2idx))
+    # print(len(dic.word2idx))
     with open(train_path, 'r', encoding="utf8") as f:
         for art_name in f:
             article, summary = get_art_abs(art_name.strip())
@@ -191,7 +191,7 @@ def prepare_dictionary(train_path, dic_out_path):
             # if (i == 2000):
             #     break
 
-    print(len(count_dic.word2count))
+    # print(len(count_dic.word2count))
     # print(count_dic.word2count)
 
     sorted_items = sorted(count_dic.word2count.items(), key=lambda item: item[1], reverse=True)
@@ -204,8 +204,8 @@ def prepare_dictionary(train_path, dic_out_path):
         j += 1
         if (j == MAX_DIC_LEN):
             break
-    print(j)
-    print(len(dic.word2idx))
+    # print(j)
+    # print(len(dic.word2idx))
 
     with open(dic_out_path, 'wb+') as output:
         pickle.dump(dic, output, pickle.HIGHEST_PROTOCOL)
