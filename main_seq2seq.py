@@ -79,7 +79,9 @@ def data_loader(args):
     print('Valid size:', len(padded_valid))
     print('Test size:', len(padded_test))
     print('Directory size', len((dic.word2idx.keys())))
-    print('Directory size 2', len(dic.word2idx))
+
+    for key in dic.word2idx.keys():
+        print(key,dic.word2idx[key])
 
     return padded_train, padded_valid, padded_test, dic
 
@@ -224,7 +226,7 @@ def main():
     # train_set = [[train_art1, train_sum1],[train_art2, train_sum2], ...] and val_set, test_set
     train_set, val_set, test_set, dic = data_loader(args)
 
-    articles_len = len(train_set[0][0])
+    # articles_len = len(train_set[0][0])
 
     # print(train_set.shape)
     # print(val_set.shape)
