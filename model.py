@@ -25,7 +25,7 @@ class Model(nn.Module):
         self.dictionary = dic  # Saving the dictionary
         self.max_oovs = max_oovs
 
-        self.embed = nn.Embedding(self.word_count - 4, self.emb_dim)
+        self.embed = nn.Embedding(self.word_count, self.emb_dim)
         self.encoder = nn.LSTM(input_size=self.emb_dim, hidden_size=hidden_dim, batch_first=True, bidirectional=True)
         self.decoder = nn.LSTM(input_size=self.emb_dim, hidden_size=hidden_dim, batch_first=True)
 
@@ -78,7 +78,7 @@ class Model(nn.Module):
         cov_loss = 0
 
         if train:
-            next_input = target[:, 0] # First word of summary (should be <SOS>)
+            next_input = unked_target[:, 0] # First word of summary (should be <SOS>)
 
         else:
             next_input = self.dictionary.word2idx['<SOS>']
@@ -195,7 +195,7 @@ class Model(nn.Module):
             # time.sleep(10)
 
             if train:
-                next_input = target[:, i + 1]
+                next_input = unked_target[:, i + 1]
                 # print(self.dictionary.idx2word[next_input])
 
             else:
