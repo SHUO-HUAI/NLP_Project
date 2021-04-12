@@ -7,4 +7,4 @@ load_data = './data_finished_50k_tiny'
 resume = None
 epoch = 25
 save = './logs-checkpoint-save'
-batch_size = 100
+batch_size = 64
