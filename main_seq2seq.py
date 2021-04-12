@@ -19,7 +19,7 @@ from classes import Dictionary
 from functions import to_cuda
 from preprocessing import read_files, prepare_data, prepare_summary, zero_pad, remove_pad, prepare_dictionary, \
     prepare_art_sum
-from model_mjc import Model
+from model import Model
 import config
 import shutil
 from rouge import Rouge
