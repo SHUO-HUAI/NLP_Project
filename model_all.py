@@ -52,7 +52,9 @@ class Model(nn.Module):
         batch_size = inputs.size(0)
 
         unked_inputs = get_unked(inputs, self.dictionary)
+        unked_target = get_unked(target, self.dictionary)
 
+        unked_target = to_cuda(unked_target)
         # inputs = to_cuda(inputs)
         # target = to_cuda(target)
         unked_inputs = to_cuda(unked_inputs)
@@ -74,7 +76,7 @@ class Model(nn.Module):
 
         cov_loss = 0
 
-        next_input = to_cuda(target[:, 0])  # First word of summary (should be <SOS>)
+        next_input = to_cuda(unked_target[:, 0])  # First word of summary (should be <SOS>)
         # print(self.dictionary.idx2word[next_input])    # <SOS>
 
         out_list = []  # Output list
@@ -194,11 +196,11 @@ class Model(nn.Module):
             out_list.append(p_vocab)
 
             if train:
-                next_input = to_cuda(target[:, i + 1])
+                next_input = unked_target[:, i + 1]
                 # print(self.dictionary.idx2word[next_input])
 
             else:
-                next_input = to_cuda(out)
+                next_input = out
 
             torch.cuda.synchronize()
             print('time cost:', time.time() - end)
