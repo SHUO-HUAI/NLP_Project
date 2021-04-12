@@ -80,8 +80,8 @@ def data_loader(args):
     print('Test size:', len(padded_test))
     print('Directory size', len((dic.word2idx.keys())))
 
-    for key in dic.word2idx.keys():
-        print(key,dic.word2idx[key])
+    # for key in dic.word2idx.keys():
+    #     print(key,dic.word2idx[key])
 
     return padded_train, padded_valid, padded_test, dic
 
