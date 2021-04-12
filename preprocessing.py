@@ -281,6 +281,8 @@ def prepare_art_sum(path, out_path, dic):
             art_tokens = [t.strip() for t in art_tokens]  # strip
             art_tokens = [t for t in art_tokens if t != ""]  # remove empty
             sum_tokens = summary.split(' ')
+            sum_tokens = [t for t in sum_tokens if
+                          t not in [SENTENCE_START, SENTENCE_END]]  # remove these tags from vocab
             sum_tokens = [t.strip() for t in sum_tokens]  # strip
             sum_tokens = [t for t in sum_tokens if t != ""]  # remove empty
 
