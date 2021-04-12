@@ -82,7 +82,7 @@ class Model(nn.Module):
         print(self.dic.shape)
 
         for i in range(target_len - 1):
-            print(i)
+            print('i', i)
             torch.cuda.synchronize()
             end = time.time()
 
