@@ -31,7 +31,7 @@ class CountDictionary(object):
 
     def add_word(self, word):
         # word = word.lower()
-        if word not in self.word2count:
+        if word not in self.word2count.keys():
             self.word2count[word] = 1
         
         else:
