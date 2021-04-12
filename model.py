@@ -91,7 +91,7 @@ class Model(nn.Module):
             torch.cuda.synchronize()
             end = time.time()
 
-            print('next input shape', next_input.shape)
+            # print('next input shape', next_input.shape)
 
             embedded_target = self.embed(next_input)  # size [b x emb_dim]
 
@@ -148,8 +148,8 @@ class Model(nn.Module):
 
             # ... PROBABILITY OF COPYING HERE ...
             # ... PROBABILITY OF COPYING HERE ...
-            p_expanded_vocab = p_vocab
-            '''
+            # p_expanded_vocab = p_vocab
+
             p_gen = p_gen.view(-1)
 
             p_copy = to_cuda(torch.tensor(1)) - p_gen  # p_gen has shape [1,1] so doing [0][0] we get the raw number
@@ -177,7 +177,7 @@ class Model(nn.Module):
                 # pass
 
                 attn_idx += 1
-            '''
+            
             # p_vocab += 1/self.word_count
             # p_expanded_vocab = F.softmax(p_expanded_vocab, dim=1)
 
