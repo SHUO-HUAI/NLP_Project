@@ -17,8 +17,8 @@ import time
 from classes import Dictionary
 # import model
 from functions import to_cuda
-from preprocessing import read_files, prepare_data, prepare_summary, zero_pad, remove_pad, prepare_train_art_sum, \
-    prepare_valid_art_sum
+from preprocessing import read_files, prepare_data, prepare_summary, zero_pad, remove_pad, prepare_dictionary, \
+    prepare_art_sum
 from model import Model
 import config
 import shutil
@@ -52,13 +52,13 @@ def data_process(args):
     dic_path = os.path.join(args.load_data, 'dictionary')
     out_path = args.load_data
 
-    dic = prepare_train_art_sum(train_path, dic_path, out_path)
-    prepare_valid_art_sum(valid_path, os.path.join(out_path, 'valid_set'), dic)
-    prepare_valid_art_sum(test_path, os.path.join(out_path, 'test_set'), dic)
+    # dic = prepare_train_art_sum(train_path, dic_path, out_path)
+    dic = prepare_dictionary(train_path, dic_path)
+    prepare_art_sum(valid_path, os.path.join(out_path, 'valid_set'), dic)
+    prepare_art_sum(test_path, os.path.join(out_path, 'test_set'), dic)
 
 
 def data_loader(args):
-
     dic_path = os.path.join(args.load_data, 'dictionary')
     out_path = args.load_data
 
@@ -77,6 +77,7 @@ def data_loader(args):
     print('Train size:', len(padded_train))
     print('Valid size:', len(padded_valid))
     print('Test size:', len(padded_test))
+    print('Directory size', len((dic.word2idx.keys())))
 
     return padded_train, padded_valid, padded_test, dic
 
@@ -131,7 +132,7 @@ def validate(val_set, model, args):
     return acc
 
 
-def train(train_set, model, criterion, optimizer, epoch, dic, args):
+def train(train_set, model, criterion, optimizer, epoch, args):
     model.train()
     print('Start of Epoch: ', epoch)
     print_count = 0
@@ -264,7 +265,7 @@ def main():
 
     for epoch in range(args.start_epoch, args.epochs):
         # adjust learning rate ?????
-        train(train_set, model, criterion, optimizer, epoch, dic, args)
+        train(train_set, model, criterion, optimizer, epoch, args)
         # acc1 = validate(val_set, model, args)
         # is_best = acc1 > best_acc1
         # best_acc1 = max(acc1, best_acc1)

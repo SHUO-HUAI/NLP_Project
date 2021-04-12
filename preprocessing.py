@@ -164,12 +164,10 @@ def read_files(stories_path, tokenized_path):
 
 
 def prepare_dictionary(train_path, dic_out_path):
-
     dic = Dictionary()
     count_dic = CountDictionary()
-    i = 0
-    
-    
+    # i = 0
+
     with open(train_path, 'r', encoding="utf8") as f:
         for art_name in f:
             article, summary = get_art_abs(art_name.strip())
@@ -181,40 +179,36 @@ def prepare_dictionary(train_path, dic_out_path):
             sum_tokens = [t.strip() for t in sum_tokens]  # strip
             sum_tokens = [t for t in sum_tokens if t != ""]  # remove empty
 
-
             for token in art_tokens:
                 count_dic.add_word(token)
-    
+
             for token in sum_tokens:
                 count_dic.add_word(token)
-                
-            i += 1
-            if(i==2000):
-                break
-            
-            
-    
-    
-    #print(len(count_dic.word2count))
-    #print(count_dic.word2count)
-            
+            #
+            # i += 1
+            # if (i == 2000):
+            #     break
+
+    # print(len(count_dic.word2count))
+    # print(count_dic.word2count)
+
     sorted_items = sorted(count_dic.word2count.items(), key=lambda item: item[1], reverse=True)
-    #print(sorted_items[:100])
-    
+    # print(sorted_items[:100])
+
     j = 0
     for word_count in sorted_items:
-        #print(word_count[0])
+        # print(word_count[0])
         dic.add_word(word_count[0])
-        j+=1
-        if(j == MAX_DIC_LEN):
+        j += 1
+        if (j == MAX_DIC_LEN):
             break
-    
-    #print(len(dic.word2idx))
-    
+
+    # print(len(dic.word2idx))
+
     with open(dic_out_path, 'wb+') as output:
         pickle.dump(dic, output, pickle.HIGHEST_PROTOCOL)
-    
-    
+    return dic
+
 
 def prepare_train_art_sum(train_path, dic_out_path, out_path):
     articles_idx = []
@@ -237,8 +231,6 @@ def prepare_train_art_sum(train_path, dic_out_path, out_path):
             art_idx = []
             sum_idx = []
 
-            
-
             for token in art_tokens:
                 dic.add_word(token)
                 art_idx.append(dic.word2idx[token])
@@ -247,7 +239,6 @@ def prepare_train_art_sum(train_path, dic_out_path, out_path):
                 dic.add_word(token)
                 sum_idx.append(dic.word2idx[token])
 
-            
             articles_idx.append(art_idx)
             summaries_idx.append(sum_idx)
 
@@ -270,9 +261,6 @@ def prepare_train_art_sum(train_path, dic_out_path, out_path):
             pickle.dump(padded_train, output, pickle.HIGHEST_PROTOCOL)
 
     return dic
-
-
-
 
 
 def prepare_art_sum(path, out_path, dic):
@@ -301,7 +289,7 @@ def prepare_art_sum(path, out_path, dic):
             sum_len = 0
 
             for token in art_tokens:
-                
+
                 if token in dic.word2idx.keys():
                     art_idx.append(dic.word2idx[token])
 
@@ -313,9 +301,9 @@ def prepare_art_sum(path, out_path, dic):
                         art_idx.append(oov_idx)
                         oov_dic[token] = oov_idx
                         oov_idx += 1
-                        
-                art_len+=1
-                if(art_len >= MAX_ART_LEN):
+
+                art_len += 1
+                if (art_len >= MAX_ART_LEN):
                     break
 
             for token in sum_tokens:
@@ -330,26 +318,25 @@ def prepare_art_sum(path, out_path, dic):
                         sum_idx.append(oov_idx)
                         oov_dic[token] = oov_idx
                         oov_idx += 1
-                        
+
                 sum_len += 1
-                if(sum_len >= MAX_SUM_LEN):
+                if (sum_len >= MAX_SUM_LEN):
                     break
 
             # print(oov_idx)
 
             articles_idx.append(art_idx)
             summaries_idx.append(sum_idx)
-            
-            
+
             i = i + 1
             if i > 10000:
                 break
-            
+
         padded_articles = zero_pad(articles_idx)
         padded_summaries = zero_pad(summaries_idx)
-        
-        #print(len(padded_articles[0]))
-        #print(len(padded_summaries[0]))
+
+        # print(len(padded_articles[0]))
+        # print(len(padded_summaries[0]))
 
         padded_data = np.transpose(np.array([padded_articles, padded_summaries], dtype=object))
 
