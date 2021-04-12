@@ -166,9 +166,9 @@ class Model(nn.Module):
                 # exit()
                 tmp_1 = (inputs == ind_tmp)
                 tmp_2 = attn * tmp_1
-                del tmp_1
+                # del tmp_1
                 tmp_3 = tmp_2.sum(1)
-                del tmp_2
+                # del tmp_2
 
                 if ind_tmp < p_vocab.size(1):
                     # print(p_gen)
@@ -180,7 +180,7 @@ class Model(nn.Module):
                 else:
                     p_w[:, ind_tmp] = p_copy * tmp_3
 
-                del tmp_3
+                # del tmp_3
 
             # exit()
 

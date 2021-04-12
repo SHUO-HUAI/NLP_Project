@@ -162,7 +162,7 @@ class Model(nn.Module):
 
             p_expanded_vocab[:, :self.word_count] += p_vocab * p_gen.view(-1, 1).repeat([1, p_vocab.shape[1]])
 
-            torch.cuda.synchronize()
+            # torch.cuda.synchronize()
             # print('time cost tmp1:', time.time() - end)
             # end = time.time()
 
