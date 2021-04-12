@@ -20,7 +20,7 @@ class Model(nn.Module):
         self.emb_dim = emb_dim  # Word embedding dimension
         self.hidden_dim = hidden_dim  # Hidden layer for encoder (BiLSTM) and decoder (LSTM)
         self.word_count = len(dic.word2idx)  # Vocabulary size
-        print(self.word_count)
+        print('word count', self.word_count)
         # self.art_len = art_len
         self.dictionary = dic  # Saving the dictionary
         self.max_oovs = max_oovs
@@ -87,7 +87,7 @@ class Model(nn.Module):
         print(target_len)
         print(len(self.dictionary.idx2word))
         for i in range(target_len - 1):
-            print(i)
+            print('i', i)
             torch.cuda.synchronize()
             end = time.time()
 
