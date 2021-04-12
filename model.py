@@ -87,9 +87,9 @@ class Model(nn.Module):
         # print(target_len)
         # print(len(self.dictionary.idx2word))
         for i in range(target_len - 1):
-            print('i', i)
-            torch.cuda.synchronize()
-            end = time.time()
+            # print('i', i)
+            # torch.cuda.synchronize()
+            # end = time.time()
 
             # print('next input shape', next_input.shape)
 
@@ -163,8 +163,8 @@ class Model(nn.Module):
             p_expanded_vocab[:, :self.word_count] += p_vocab * p_gen.view(-1, 1).repeat([1, p_vocab.shape[1]])
 
             torch.cuda.synchronize()
-            print('time cost tmp1:', time.time() - end)
-            end = time.time()
+            # print('time cost tmp1:', time.time() - end)
+            # end = time.time()
 
             attn_idx = 0
             for word in inputs.view(-1, batch_size):
@@ -177,7 +177,7 @@ class Model(nn.Module):
                 # pass
 
                 attn_idx += 1
-            
+
             # p_vocab += 1/self.word_count
             # p_expanded_vocab = F.softmax(p_expanded_vocab, dim=1)
 
@@ -200,8 +200,8 @@ class Model(nn.Module):
 
             else:
                 next_input = out
-            torch.cuda.synchronize()
-            print('time cost tmp2:', time.time() - end)
+            # torch.cuda.synchronize()
+            # print('time cost tmp2:', time.time() - end)
         # print('Out_List:', out_list)
         out_list = torch.stack(out_list, 1)
         # print('Out_List:', out_list)
