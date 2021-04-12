@@ -190,7 +190,7 @@ def prepare_dictionary(train_path, dic_out_path):
             #     break
 
     print(len(count_dic.word2count))
-    print(count_dic.word2count)
+    # print(count_dic.word2count)
 
     sorted_items = sorted(count_dic.word2count.items(), key=lambda item: item[1], reverse=True)
     # print(sorted_items[:100])
