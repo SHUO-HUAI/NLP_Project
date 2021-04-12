@@ -172,7 +172,7 @@ class Model(nn.Module):
             # start = time.time()
             # 3.8.3. add all duplicate attns to a distinct matrix
             for dup in dup_list:
-                mask = np.array(input == dup, dtype=float)
+                mask = np.array(input.cpu() == dup, dtype=float)
                 masked_idx_sum += mask
                 attn_mask = torch.mul(to_cuda(Variable(torch.Tensor(mask))), attn)
                 attn_sum = attn_mask.sum(1).unsqueeze(1)  # [b x 1]
