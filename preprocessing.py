@@ -212,57 +212,57 @@ def prepare_dictionary(train_path, dic_out_path):
     return dic
 
 
-def prepare_train_art_sum(train_path, dic_out_path, out_path):
-    articles_idx = []
-    summaries_idx = []
-
-    dic = Dictionary()
-    i = 0
-
-    with open(train_path, 'r', encoding="utf8") as f:
-        for art_name in f:
-            article, summary = get_art_abs(art_name.strip())
-
-            art_tokens = article.split(' ')
-            art_tokens = [t.strip() for t in art_tokens]  # strip
-            art_tokens = [t for t in art_tokens if t != ""]  # remove empty
-            sum_tokens = summary.split(' ')
-            sum_tokens = [t.strip() for t in sum_tokens]  # strip
-            sum_tokens = [t for t in sum_tokens if t != ""]  # remove empty
-
-            art_idx = []
-            sum_idx = []
-
-            for token in art_tokens:
-                dic.add_word(token)
-                art_idx.append(dic.word2idx[token])
-
-            for token in sum_tokens:
-                dic.add_word(token)
-                sum_idx.append(dic.word2idx[token])
-
-            articles_idx.append(art_idx)
-            summaries_idx.append(sum_idx)
-
-            if i > 100:
-                break
-            i = i + 1
-
-        padded_articles = zero_pad(articles_idx)
-        padded_summaries = zero_pad(summaries_idx)
-
-        padded_train = np.transpose(np.array([padded_articles, padded_summaries], dtype=object))
-
-        with open(dic_out_path, 'wb+') as output:
-            pickle.dump(dic, output, pickle.HIGHEST_PROTOCOL)
-
-        if not os.path.exists(out_path):
-            os.mkdir(out_path)
-
-        with open(os.path.join(out_path, 'train_set'), 'wb+') as output:
-            pickle.dump(padded_train, output, pickle.HIGHEST_PROTOCOL)
-
-    return dic
+# def prepare_train_art_sum(train_path, dic_out_path, out_path):
+#     articles_idx = []
+#     summaries_idx = []
+#
+#     dic = Dictionary()
+#     i = 0
+#
+#     with open(train_path, 'r', encoding="utf8") as f:
+#         for art_name in f:
+#             article, summary = get_art_abs(art_name.strip())
+#
+#             art_tokens = article.split(' ')
+#             art_tokens = [t.strip() for t in art_tokens]  # strip
+#             art_tokens = [t for t in art_tokens if t != ""]  # remove empty
+#             sum_tokens = summary.split(' ')
+#             sum_tokens = [t.strip() for t in sum_tokens]  # strip
+#             sum_tokens = [t for t in sum_tokens if t != ""]  # remove empty
+#
+#             art_idx = []
+#             sum_idx = []
+#
+#             for token in art_tokens:
+#                 dic.add_word(token)
+#                 art_idx.append(dic.word2idx[token])
+#
+#             for token in sum_tokens:
+#                 dic.add_word(token)
+#                 sum_idx.append(dic.word2idx[token])
+#
+#             articles_idx.append(art_idx)
+#             summaries_idx.append(sum_idx)
+#
+#             if i > 100:
+#                 break
+#             i = i + 1
+#
+#         padded_articles = zero_pad(articles_idx)
+#         padded_summaries = zero_pad(summaries_idx)
+#
+#         padded_train = np.transpose(np.array([padded_articles, padded_summaries], dtype=object))
+#
+#         with open(dic_out_path, 'wb+') as output:
+#             pickle.dump(dic, output, pickle.HIGHEST_PROTOCOL)
+#
+#         if not os.path.exists(out_path):
+#             os.mkdir(out_path)
+#
+#         with open(os.path.join(out_path, 'train_set'), 'wb+') as output:
+#             pickle.dump(padded_train, output, pickle.HIGHEST_PROTOCOL)
+#
+#     return dic
 
 
 def prepare_art_sum(path, out_path, dic):
@@ -281,8 +281,8 @@ def prepare_art_sum(path, out_path, dic):
             art_tokens = [t.strip() for t in art_tokens]  # strip
             art_tokens = [t for t in art_tokens if t != ""]  # remove empty
             sum_tokens = summary.split(' ')
-            sum_tokens = [t for t in sum_tokens if
-                          t not in [SENTENCE_START, SENTENCE_END]]  # remove these tags from vocab
+            # sum_tokens = [t for t in sum_tokens if
+            #               t not in [SENTENCE_START, SENTENCE_END]]  # remove these tags from vocab
             sum_tokens = [t.strip() for t in sum_tokens]  # strip
             sum_tokens = [t for t in sum_tokens if t != ""]  # remove empty
 
