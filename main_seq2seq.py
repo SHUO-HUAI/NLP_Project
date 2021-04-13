@@ -103,6 +103,7 @@ def validate(val_set, model, args):
                 start_tmp = start_tmp + args.batch_size
             else:
                 cur_batch = val_set[start_tmp:]
+                start_tmp = start_tmp + args.batch_size
 
             padded_articles = cur_batch[:, 0]
             padded_summaries = cur_batch[:, 1]
@@ -129,8 +130,8 @@ def validate(val_set, model, args):
                 output_list.append(out_tmp)
                 target_list.append(tar_tmp)
 
-            if print_count % 100 == 0:
-                print('Test [' + str(print_count) + '/' + str(batch_num) + ']')
+            # if print_count % 100 == 0:
+            print('Test [' + str(print_count) + '/' + str(batch_num) + ']')
 
         acc = accuracy(output_list, target_list)
     return acc
