@@ -117,7 +117,7 @@ def validate(val_set, model, args):
             tensor_art = to_cuda(tensor_art)
             tensor_sum = to_cuda(tensor_sum)
 
-            out_list, _ = model(tensor_art, tensor_sum, False)
+            out_list, _ = model(tensor_art, None, False)
 
             output_list = []
             target_list = []

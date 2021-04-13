@@ -41,10 +41,10 @@ class Model(nn.Module):
         self.V1 = nn.Linear(hidden_dim * 3, hidden_dim * 3)
         self.V2 = nn.Linear(hidden_dim * 3, self.word_count)
 
-    def forward(self, inputs, target, train=True):
+    def forward(self, inputs, target=None, train=True):
 
         input_len = inputs.size(-1)  # max input sequence length
-        target_len = target.size(-1)  # max target sequence length
+
 
         # inputs = inputs.view(-1, input_len)
         # # If I pass only 1 article and 1 summary I add one dimension at the
@@ -52,13 +52,13 @@ class Model(nn.Module):
         # target = target.view(-1, target_len)
 
         unked_inputs = get_unked(inputs, self.dictionary)
-        unked_target = get_unked(target, self.dictionary)
 
+        target_len = 400
         batch_size = inputs.size(0)
 
         # inputs = to_cuda(inputs)
         unked_inputs = to_cuda(unked_inputs)
-        unked_target = to_cuda(unked_target)
+
         # target = to_cuda(target)
 
         # print('Input shape:',inputs.shape)  # Size [b x input_len]
@@ -78,6 +78,9 @@ class Model(nn.Module):
         cov_loss = 0
 
         if train:
+            target_len = target.size(-1)  # max target sequence length
+            unked_target = get_unked(target, self.dictionary)
+            unked_target = to_cuda(unked_target)
             next_input = unked_target[:, 0] # First word of summary (should be <SOS>)
 
         else:
