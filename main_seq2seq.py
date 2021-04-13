@@ -142,7 +142,6 @@ def train(train_set, model, criterion, optimizer, epoch, args):
     print_count = 0
     end = time.time()
 
-
     np.random.shuffle(train_set)
 
     data_size = len(train_set)
@@ -157,6 +156,7 @@ def train(train_set, model, criterion, optimizer, epoch, args):
             start_tmp = start_tmp + args.batch_size
         else:
             cur_batch = train_set[start_tmp:]
+            start_tmp = start_tmp + args.batch_size
 
         padded_articles = cur_batch[:, 0]
         padded_summaries = cur_batch[:, 1]
