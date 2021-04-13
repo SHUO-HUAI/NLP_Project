@@ -17,7 +17,7 @@ SENTENCE_START = '<SOS>'
 SENTENCE_END = '<EOS>'
 END_TOKENS = ['.', '!', '?', '...', "'", "`", '"', dm_single_close_quote, dm_double_close_quote,
               ")"]  #
-MAX_DIC_LEN = 50000
+MAX_DIC_LEN = 30000
 MAX_ART_LEN = 400
 MAX_SUM_LEN = 100
 
@@ -334,10 +334,10 @@ def prepare_art_sum(path, out_path, dic):
 
             i = i + 1
             if 'train' in path:
-                if i > 10000:
+                if i >= 10000:
                     break
             else:
-                if i > 1000:
+                if i >= 1000:
                     break
 
         padded_articles = zero_pad(articles_idx)
