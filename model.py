@@ -82,6 +82,7 @@ class Model(nn.Module):
             unked_target = get_unked(target, self.dictionary)
             unked_target = to_cuda(unked_target)
             next_input = unked_target[:, 0] # First word of summary (should be <SOS>)
+            print(next_input)
 
         else:
             next_input = to_cuda(torch.tensor(self.dictionary.word2idx['<SOS>']))
