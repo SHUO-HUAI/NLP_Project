@@ -190,7 +190,7 @@ def train(train_set, model, criterion, optimizer, epoch, args):
         loss += cov_loss
 
         # if print_count % 100 == 0:
-        print('Epoch: [' + str(epoch) + '] [' + str(print_count) + '/' + str(batch_num) + ']', 'Loss ', loss)
+        print('Epoch: [' + str(epoch) + '] [' + str(print_count) + '/' + str(batch_num) + ']', 'Loss ', loss.cup().numpy(), 'cov Loss', cov_loss.cup().numpy())
 
         loss.backward()
         optimizer.step()
