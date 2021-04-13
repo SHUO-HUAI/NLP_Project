@@ -45,6 +45,8 @@ class Model(nn.Module):
 
         input_len = inputs.size(-1)  # max input sequence length
 
+        print(target[:, 0])
+
 
         # inputs = inputs.view(-1, input_len)
         # # If I pass only 1 article and 1 summary I add one dimension at the
