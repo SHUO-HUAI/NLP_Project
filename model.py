@@ -44,9 +44,9 @@ class Model(nn.Module):
     def forward(self, inputs, target=None, train=True):
 
         input_len = inputs.size(-1)  # max input sequence length
-
+        print(target.shape)
         print(target[:, 0])
-
+        # print(target[:, 0])
 
         # inputs = inputs.view(-1, input_len)
         # # If I pass only 1 article and 1 summary I add one dimension at the
