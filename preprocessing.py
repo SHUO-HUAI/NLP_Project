@@ -307,7 +307,7 @@ def prepare_art_sum(path, out_path, dic):
                         oov_idx += 1
 
                 art_len += 1
-                if (art_len >= MAX_ART_LEN):
+                if art_len >= MAX_ART_LEN:
                     break
 
             for token in sum_tokens:
@@ -324,7 +324,7 @@ def prepare_art_sum(path, out_path, dic):
                         oov_idx += 1
 
                 sum_len += 1
-                if (sum_len >= MAX_SUM_LEN):
+                if sum_len >= MAX_SUM_LEN:
                     break
 
             # print(oov_idx)
