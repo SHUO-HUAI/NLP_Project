@@ -81,7 +81,7 @@ class Model(nn.Module):
             next_input = unked_target[:, 0] # First word of summary (should be <SOS>)
 
         else:
-            next_input = self.dictionary.word2idx['<SOS>']
+            next_input = to_cuda(torch.tensor(self.dictionary.word2idx['<SOS>']))
 
         out_list = []  # Output list
         # print(target_len)
