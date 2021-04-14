@@ -37,7 +37,7 @@ class Model(nn.Module):
         self.wh = nn.Linear(hidden_dim * 2, 1)  # for changing context vector into a scalar
         self.ws = nn.Linear(hidden_dim, 1)  # for changing hidden state into a scalar
         self.wx = nn.Linear(emb_dim, 1)  # for changing input embedding into a scalar
-        self.tanh = nn.tanh()
+        self.tanh = nn.Tanh()
 
         self.V1 = nn.Linear(hidden_dim * 3, hidden_dim * 3)
         self.V2 = nn.Linear(hidden_dim * 3, self.word_count)
