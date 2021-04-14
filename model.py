@@ -37,6 +37,7 @@ class Model(nn.Module):
         self.wh = nn.Linear(hidden_dim * 2, 1)  # for changing context vector into a scalar
         self.ws = nn.Linear(hidden_dim, 1)  # for changing hidden state into a scalar
         self.wx = nn.Linear(emb_dim, 1)  # for changing input embedding into a scalar
+        self.tanh = nn.tanh()
 
         self.V1 = nn.Linear(hidden_dim * 3, hidden_dim * 3)
         self.V2 = nn.Linear(hidden_dim * 3, self.word_count)
@@ -123,7 +124,7 @@ class Model(nn.Module):
             attn1 = self.Wh(encoded.contiguous().view(-1, encoded.size(2))) + self.Ws(state.clone().squeeze()).repeat(
                 input_len, 1)
 
-            attn2 = self.v(attn1)  # Shape [b*input_len x 1]
+            attn2 = self.v(tanh(attn1))  # Shape [b*input_len x 1]
 
             attn = F.softmax(attn2.view(batch_size, input_len), dim=1)  # Shape [b x input_len]
 
