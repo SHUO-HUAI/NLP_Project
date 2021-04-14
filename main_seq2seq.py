@@ -126,7 +126,7 @@ def validate(val_set, model, args):
                 k = remove_pad(tensor_sum[j, :])
                 print(out_list[j, :k].shape)
                 out_tmp = ' '.join(map(str, torch.argmax(out_list[j, :k], 1).cpu().numpy()))
-                tar_tmp = ' '.join(map(str, torch.argmax(tensor_sum[j, :k], 1).cpu().numpy()))
+                tar_tmp = ' '.join(map(str, (tensor_sum[j, :k]).cpu().numpy()))
 
                 output_list.append(out_tmp)
                 target_list.append(tar_tmp)
