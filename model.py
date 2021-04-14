@@ -207,7 +207,7 @@ class Model(nn.Module):
 
             else:
                 next_input = out
-                print(out >= self.word_count - 1)
+                print((out >= self.word_count - 1) * out)
             # torch.cuda.synchronize()
             # print('time cost tmp2:', time.time() - end)
         # print('Out_List:', out_list)
