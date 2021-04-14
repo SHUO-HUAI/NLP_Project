@@ -206,8 +206,8 @@ class Model(nn.Module):
                 # print(self.dictionary.idx2word[next_input])
 
             else:
-                next_input = out
-                print((out >= self.word_count - 1) * out)
+                next_input = (out < self.word_count) * out
+                # print((out < self.word_count) * out)
             # torch.cuda.synchronize()
             # print('time cost tmp2:', time.time() - end)
         # print('Out_List:', out_list)
