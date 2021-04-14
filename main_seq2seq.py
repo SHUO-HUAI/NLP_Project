@@ -93,6 +93,7 @@ def validate(val_set, model, args):
     data_size = len(val_set)
     start_tmp = 0
     batch_num = math.ceil(data_size / args.batch_size)
+    acc_all = 0.0
 
     with torch.no_grad():
         while start_tmp < data_size:
@@ -134,9 +135,13 @@ def validate(val_set, model, args):
             # if print_count % 100 == 0:
             print('Test [' + str(print_count) + '/' + str(batch_num) + ']')
 
-        acc = accuracy(output_list, target_list)
-        print('Accuracy:', acc)
-    return acc
+            print(len(cur_batch))
+
+            acc = accuracy(output_list, target_list)
+            acc_all = acc_all + acc * len(cur_batch)
+        acc_all = acc_all / data_size
+        print('Accuracy:', acc_all)
+    return acc_all
 
 
 def train(train_set, model, criterion, optimizer, epoch, args):
@@ -185,14 +190,15 @@ def train(train_set, model, criterion, optimizer, epoch, args):
         loss = to_cuda(loss)
 
         for j in range(out_list.shape[0]):
-            k = remove_pad(tensor_sum[j,:])
+            k = remove_pad(tensor_sum[j, :])
 
             loss += criterion(torch.log(out_list[j, :k]), tensor_sum[j, :k])
 
         loss += cov_loss
 
         # if print_count % 100 == 0:
-        print('Epoch: [' + str(epoch) + '] [' + str(print_count) + '/' + str(batch_num) + ']', 'Loss ', loss.cpu().detach().numpy(), 'cov Loss', cov_loss.cpu().detach().numpy())
+        print('Epoch: [' + str(epoch) + '] [' + str(print_count) + '/' + str(batch_num) + ']', 'Loss ',
+              loss.cpu().detach().numpy(), 'cov Loss', cov_loss.cpu().detach().numpy())
 
         loss.backward()
         optimizer.step()
