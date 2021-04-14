@@ -132,15 +132,12 @@ def validate(val_set, model, args):
                 output_list.append(out_tmp)
                 target_list.append(tar_tmp)
 
-            # if print_count % 100 == 0:
-            print('Test [' + str(print_count) + '/' + str(batch_num) + ']')
-
-            print(len(cur_batch))
-
             acc = accuracy(output_list, target_list)
+            print('Test [' + str(print_count) + '/' + str(batch_num) + ']', 'Acc ', acc)
+
             acc_all = acc_all + acc * len(cur_batch)
         acc_all = acc_all / data_size
-        print('Accuracy:', acc_all)
+        print(' *Accuracy all:', acc_all)
     return acc_all
 
 
