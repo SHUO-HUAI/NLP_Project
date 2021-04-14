@@ -207,6 +207,7 @@ class Model(nn.Module):
 
             else:
                 next_input = out
+                print(next_input)
             # torch.cuda.synchronize()
             # print('time cost tmp2:', time.time() - end)
         # print('Out_List:', out_list)
