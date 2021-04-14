@@ -188,6 +188,7 @@ def train(train_set, model, criterion, optimizer, epoch, args):
 
         for j in range(out_list.shape[0]):
             k = remove_pad(tensor_sum[j, :])
+            k = min(k, len(out_list[j]), len(tensor_sum[j]))
 
             loss += criterion(torch.log(out_list[j, :k]), tensor_sum[j, :k])
 
