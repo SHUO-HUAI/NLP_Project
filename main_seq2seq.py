@@ -230,6 +230,9 @@ def main():
 
     assert os.path.exists(load_data_floder)
 
+    if not os.path.exists(args.save):
+        os.mkdir(args.save)
+
     # train_set = [[train_art1, train_sum1],[train_art2, train_sum2], ...] and val_set, test_set
     train_set, val_set, test_set, dic = data_loader(args)
 
