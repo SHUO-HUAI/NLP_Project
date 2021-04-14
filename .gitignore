@@ -155,3 +155,5 @@ fabric.properties
 /data_finished/*
 /data_finished_small/
 /data_finished_small/*
+/data_finish/
+/data_finish/*
