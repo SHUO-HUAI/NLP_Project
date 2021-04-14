@@ -123,10 +123,10 @@ def validate(val_set, model, args):
             target_list = []
 
             for j in range(out_list.shape[0]):
-                k = remove_pad(tensor_sum[j, 1:])
-                print(out_list[j, :k - 1].shape)
-                out_tmp = ' '.join(map(str, torch.argmax(out_list[j, :k - 1], 1).cpu().numpy()))
-                tar_tmp = ' '.join(map(str, torch.argmax(tensor_sum[j, 1:k], 1).cpu().numpy()))
+                k = remove_pad(tensor_sum[j, :])
+                print(out_list[j, :k].shape)
+                out_tmp = ' '.join(map(str, torch.argmax(out_list[j, :k], 1).cpu().numpy()))
+                tar_tmp = ' '.join(map(str, torch.argmax(tensor_sum[j, :k], 1).cpu().numpy()))
 
                 output_list.append(out_tmp)
                 target_list.append(tar_tmp)
@@ -184,9 +184,9 @@ def train(train_set, model, criterion, optimizer, epoch, args):
         loss = to_cuda(loss)
 
         for j in range(out_list.shape[0]):
-            k = remove_pad(tensor_sum[j, 1:])
+            k = remove_pad(tensor_sum[j,:])
 
-            loss += criterion(torch.log(out_list[j, :k - 1]), tensor_sum[j, 1:k])
+            loss += criterion(torch.log(out_list[j, :k]), tensor_sum[j, :k])
 
         loss += cov_loss
 

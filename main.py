@@ -18,7 +18,7 @@ import preprocessing
 import model
 import functions
 from functions import to_cuda
-from preprocessing import read_files, prepare_data, prepare_summary, zero_pad, remove_pad, get_unked, prepare_train_art_sum, prepare_art_sum, prepare_dictionary
+from preprocessing import read_files, prepare_data, prepare_summary, zero_pad, remove_pad, get_unked, prepare_art_sum, prepare_dictionary
 from model import Model
 import pickle
 import config
@@ -57,7 +57,7 @@ test_path = 'test_all.txt'
 dic_path = 'dictionary'
 out_path = 'data_finish/'
 
-prepare_dictionary(train_path, dic_path)
+#prepare_dictionary(train_path, dic_path)
 
 dic = Dictionary()
 
@@ -90,12 +90,14 @@ print('Train size:',len(padded_train))
 print('Valid size:',len(padded_valid))
 print('Test size:',len(padded_test))
 
-exit()
-#FROM NOW ON ITS DIFFERENT
+padded_articles = padded_train[:,0]
+padded_sums = padded_train[:,1]
 
+padded_articles = np.array([np.array(tmp) for tmp in padded_articles])
+padded_sums = np.array([np.array(tmp) for tmp in padded_sums])
 
 tensor_art = torch.LongTensor(padded_articles)
-tensor_sum = torch.LongTensor(padded_summaries)
+tensor_sum = torch.LongTensor(padded_sums)
 
 articles_len = len(tensor_art[0])
 
@@ -115,28 +117,37 @@ for i in range(100):
     print('Epoch:', i + 1)
 
     opt.zero_grad()
-
-    out_list, cov_loss = model(tensor_art[0], tensor_sum[0])
-
+    out_list, cov_loss = model(tensor_art[0:2], tensor_sum[0:2])
     # print(len(out_list[0][0]))
-
     loss = torch.tensor(0.)
     loss = to_cuda(loss)
     for j in range(out_list.shape[0]):
         # loss += criterion(out_list[j],tensor_sum[j,1:]) # '1:' Remove <SOS>
 
-        k = remove_pad(tensor_sum[j, 1:])
+        k = remove_pad(tensor_sum[j, :])
 
-        loss += criterion(torch.log(out_list[j, :k - 1]), tensor_sum[j, 1:k])
+        loss += criterion(torch.log(out_list[j, :k]), tensor_sum[j, :k])
 
         # loss += cov_loss
 
     # PRINT
+    k = remove_pad(tensor_sum[0,:])
+    #print(tensor_sum[0,:k])
+    
     out_string = []
-    for word in out_list[j, :k - 1]:
-        out_string.append(dic.idx2word[torch.argmax(word)])
+    for word in tensor_sum[0,:k]:
+        out_string.append(dic.idx2word[word])
+        
+    #print(len(out_string))
 
+    
+    out_string = []
+    for word in out_list[0, :k]:
+        out_string.append(dic.idx2word[torch.argmax(word)])
+        
+    
     print(out_string)
+    
     # PRINT
 
     # loss = criterion(out_list,tensor_sum[:,1:])+cov_loss
