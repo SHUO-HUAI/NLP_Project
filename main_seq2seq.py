@@ -135,6 +135,7 @@ def validate(val_set, model, args):
             print('Test [' + str(print_count) + '/' + str(batch_num) + ']')
 
         acc = accuracy(output_list, target_list)
+        print('Accuracy:', acc)
     return acc
 
 
