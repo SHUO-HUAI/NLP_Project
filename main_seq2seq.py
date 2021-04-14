@@ -280,11 +280,11 @@ def main():
 
     for epoch in range(args.start_epoch, args.epochs):
         # adjust learning rate ?????
-        train(train_set, model, criterion, optimizer, epoch, args)
-        acc1 = validate(val_set, model, args)
-        is_best = acc1 > best_acc1
-        best_acc1 = max(acc1, best_acc1)
-
+        # train(train_set, model, criterion, optimizer, epoch, args)
+        # acc1 = validate(val_set, model, args)
+        # is_best = acc1 > best_acc1
+        # best_acc1 = max(acc1, best_acc1)
+        is_best = True
         save_checkpoint({
             'epoch': epoch + 1,
             'state_dict': model.state_dict(),
