@@ -84,12 +84,12 @@ class Model(nn.Module):
             target_len = target.size(-1)  # max target sequence length
             unked_target = get_unked(target, self.dictionary)
             unked_target = to_cuda(unked_target)
-            next_input = to_cuda(torch.tensor([self.dictionary.word2idx['<SOS>']]*batch_size))
-            #next_input = unked_target[:, 0] # First word of summary (should be <SOS>)
+            next_input = to_cuda(torch.tensor([self.dictionary.word2idx['<SOS>']] * batch_size))
+            # next_input = unked_target[:, 0] # First word of summary (should be <SOS>)
             # print(next_input)
 
         else:
-            next_input = to_cuda(torch.tensor([self.dictionary.word2idx['<SOS>']]*batch_size))
+            next_input = to_cuda(torch.tensor([self.dictionary.word2idx['<SOS>']] * batch_size))
 
         out_list = []  # Output list
         # print(target_len)
@@ -207,7 +207,7 @@ class Model(nn.Module):
                 # print(self.dictionary.idx2word[next_input])
 
             else:
-                next_input = (out < self.word_count) * out
+                next_input = (out < self.word_count) * out + (out >= self.word_count) * to_cuda(torch.tensor(1.0))
                 # print((out < self.word_count) * out)
             # torch.cuda.synchronize()
             # print('time cost tmp2:', time.time() - end)
