@@ -8,3 +8,4 @@ resume = None
 epoch = 25
 save = './logs-checkpoint-save'
 batch_size = 80
+lr = 0.1
