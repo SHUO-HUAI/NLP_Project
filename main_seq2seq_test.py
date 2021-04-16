@@ -260,8 +260,19 @@ def train(train_set, model, criterion, optimizer, epoch, args):
             #
             # output_list.append(out_tmp)
             # target_list.append(tar_tmp)
-            print(out_tmp)
-            print(tar_tmp)
+            # print(out_tmp)
+            # print(tar_tmp)
+
+            out_string = []
+            for word in out_tmp:
+                out_string.append(model.dictionary.idx2word[torch.argmax(word)])
+            print(out_string)
+
+            out_string = []
+            for word in tar_tmp:
+                out_string.append(model.dictionary.idx2word[torch.argmax(word)])
+            print(out_string)
+
             # input()
 
             loss += criterion(torch.log(out_list[j, :k]), tensor_sum[j, :k])
