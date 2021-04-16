@@ -101,6 +101,7 @@ def validate(val_set, model, args):
 
     data_size = len(val_set)
     start_tmp = 0
+    args.batch_size = 5
     batch_num = math.ceil(data_size / args.batch_size)
     acc_all = 0.0
 
@@ -147,6 +148,7 @@ def validate(val_set, model, args):
             acc_all = acc_all + acc * len(cur_batch)
         acc_all = acc_all / data_size
         print(' *Accuracy all:', acc_all)
+    args.batch_size = 1
     return acc_all
 
 
