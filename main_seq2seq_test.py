@@ -312,6 +312,8 @@ def train(train_set, model, criterion, optimizer, epoch, args):
 
 
 def accuracy(output, target):
+    print(output)
+    print(target)
     rouge = Rouge()
     rouge_score = rouge.get_scores(output, target, avg=True)
     r1 = rouge_score["rouge-1"]['r']
