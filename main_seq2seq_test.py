@@ -267,12 +267,12 @@ def train(train_set, model, criterion, optimizer, epoch, args):
 
             out_string = []
             for word in out_tmp:
-                out_string.append(model.dictionary.idx2word[torch.argmax(word)])
+                out_string.append(model.dictionary.idx2word[word])
             print(out_string)
 
             out_string = []
             for word in tar_tmp:
-                out_string.append(model.dictionary.idx2word[torch.argmax(word)])
+                out_string.append(model.dictionary.idx2word[word])
             print(out_string)
 
             # input()
