@@ -148,7 +148,7 @@ def test(val_set, model):
     batch_size = 1
     data_size = len(val_set)
     # batch_num = math.ceil(data_size / batch_size)
-
+    start_tmp = 0
     with torch.no_grad():
         while start_tmp < data_size:
 
