@@ -135,7 +135,7 @@ def validate(val_set, model, args):
             target_list = []
 
             for j in range(out_list.shape[0]):
-                k = remove_pad(tensor_sum[j, 1:])
+                k = remove_pad(tensor_sum[j])
                 # print(out_list[j, :k].shape)
                 out_tmp = ' '.join(map(str, torch.argmax(out_list[j, :k - 1], 1).cpu().numpy()))
                 tar_tmp = ' '.join(map(str, (tensor_sum[j, 1:k]).cpu().numpy()))
@@ -143,8 +143,8 @@ def validate(val_set, model, args):
                 output_list.append(out_tmp)
                 target_list.append(tar_tmp)
 
-                out_tmp = torch.argmax(out_list[j, :k], 1).cpu().numpy()
-                tar_tmp = (tensor_sum[j, :k]).cpu().numpy()
+                out_tmp = torch.argmax(out_list[j, :k-1], 1).cpu().numpy()
+                tar_tmp = (tensor_sum[j, 1:k]).cpu().numpy()
                 #
                 # output_list.append(out_tmp)
                 # target_list.append(tar_tmp)
@@ -279,7 +279,7 @@ def train(train_set, model, criterion, optimizer, epoch, args):
             # k = remove_pad(tensor_sum[j, :])
             # print(out_list[j, :k].shape)
 
-            k = remove_pad(tensor_sum[j, 1:])
+            k = remove_pad(tensor_sum[j])
             k = min(k, len(out_list[j]), len(tensor_sum[j]))
             # k = min(k, len(out_list[j]), len(tensor_sum[j, 1:]))
 

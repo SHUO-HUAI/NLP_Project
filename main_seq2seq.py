@@ -128,7 +128,7 @@ def validate(val_set, model, args):
                 # # print(out_list[j, :k].shape)
                 # out_tmp = ' '.join(map(str, torch.argmax(out_list[j, :k], 1).cpu().numpy()))
                 # tar_tmp = ' '.join(map(str, (tensor_sum[j, :k]).cpu().numpy()))
-                k = remove_pad(tensor_sum[j, 1:])
+                k = remove_pad(tensor_sum[j])
                 # print(out_list[j, :k].shape)
                 out_tmp = ' '.join(map(str, torch.argmax(out_list[j, :k - 1], 1).cpu().numpy()))
                 tar_tmp = ' '.join(map(str, (tensor_sum[j, 1:k]).cpu().numpy()))
@@ -195,11 +195,15 @@ def train(train_set, model, criterion, optimizer, epoch, args):
             # k = min(k, len(out_list[j]), len(tensor_sum[j]))
             #
             # loss += criterion(torch.log(out_list[j, :k]), tensor_sum[j, :k])
-            k = remove_pad(tensor_sum[j, 1:])
+            k = remove_pad(tensor_sum[j])
             k = min(k, len(out_list[j]), len(tensor_sum[j]))
             # k = min(k, len(out_list[j]), len(tensor_sum[j, 1:]))
 
             loss += criterion(torch.log(out_list[j, :k - 1]), tensor_sum[j, 1:k])
+
+            # k = remove_pad(tensor_sum[j])
+            # k = min(k, len(out_list[j]), len(tensor_sum[j]))
+            # loss += criterion(torch.log(out_list[j, :]) ,tensor_sum[j, 1:k])
 
         loss += cov_loss
 
