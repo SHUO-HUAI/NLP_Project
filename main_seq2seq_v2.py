@@ -303,7 +303,7 @@ def main():
     for epoch in range(args.start_epoch, args.epochs):
         # adjust learning rate ?????
 
-        adjust_learning_rate(optimizer, epoch, args)
+        # adjust_learning_rate(optimizer, epoch, args)
 
         train(train_set, model, criterion, optimizer, epoch, args)
         acc1 = validate(val_set, model, args)
