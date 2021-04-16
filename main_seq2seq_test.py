@@ -14,11 +14,11 @@ import numpy as np
 from collections import Counter
 from torch.autograd import Variable
 import time
-from classes import Dictionary
+from classes import Dictionary, CountDictionary
 # import model
 from functions import to_cuda
 from preprocessing import read_files, prepare_data, prepare_summary, zero_pad, remove_pad, prepare_dictionary, \
-    prepare_art_sum
+    prepare_art_sum,test_dic,test_train
 from model import Model
 import config
 import shutil
@@ -42,6 +42,11 @@ parser.add_argument('--lr', '--learning-rate', default=config.lr, type=float,
 
 best_acc1 = 0.0
 
+
+dic_tmp = test_dic()
+# prepare_art_sum
+test_train(dic_tmp)
+exit()
 
 def data_process(args):
     os.mkdir(args.load_data)
