@@ -143,6 +143,26 @@ def validate(val_set, model, args):
                 output_list.append(out_tmp)
                 target_list.append(tar_tmp)
 
+                out_tmp = torch.argmax(out_list[j, :k], 1).cpu().numpy()
+                tar_tmp = (tensor_sum[j, :k]).cpu().numpy()
+                #
+                # output_list.append(out_tmp)
+                # target_list.append(tar_tmp)
+                # print(out_tmp)
+                # print(tar_tmp)
+                print('*************************************************************************')
+
+                out_string = []
+                for word in out_tmp:
+                    out_string.append(model.dictionary.idx2word[word])
+                print(out_string)
+
+                out_string = []
+                for word in tar_tmp:
+                    out_string.append(model.dictionary.idx2word[word])
+                print(out_string)
+                print('*************************************************************************')
+
             acc = accuracy(output_list, target_list)
             print('Test [' + str(print_count) + '/' + str(batch_num) + ']', 'Acc ', acc)
 
