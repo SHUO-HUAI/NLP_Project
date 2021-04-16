@@ -246,6 +246,17 @@ def train(train_set, model, criterion, optimizer, epoch, args):
             k = remove_pad(tensor_sum[j, :])
             k = min(k, len(out_list[j]), len(tensor_sum[j]))
 
+            k = remove_pad(tensor_sum[j, :])
+            # print(out_list[j, :k].shape)
+            out_tmp = torch.argmax(out_list[j, :k], 1).cpu().numpy()
+            tar_tmp = (tensor_sum[j, :k]).cpu().numpy()
+            #
+            # output_list.append(out_tmp)
+            # target_list.append(tar_tmp)
+            print(out_tmp)
+            print(tar_tmp)
+            input()
+
             loss += criterion(torch.log(out_list[j, :k]), tensor_sum[j, :k])
 
         loss += cov_loss
