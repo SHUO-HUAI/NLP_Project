@@ -18,7 +18,7 @@ from classes import Dictionary, CountDictionary
 # import model
 from functions import to_cuda
 from preprocessing import read_files, prepare_data, prepare_summary, zero_pad, remove_pad, prepare_dictionary, \
-    prepare_art_sum,test_dic,test_train
+    prepare_art_sum, test_dic, test_train
 from model import Model
 import config
 import shutil
@@ -41,6 +41,7 @@ parser.add_argument('--lr', '--learning-rate', default=config.lr, type=float,
                     metavar='LR', help='initial learning rate', dest='lr')
 
 best_acc1 = 0.0
+
 
 #
 # dic_tmp = test_dic()
@@ -67,7 +68,6 @@ def data_process(args):
 
 
 def data_loader(args):
-
     args.batch_size = 1
     dic_path = os.path.join(args.load_data, 'dictionary')
     args.load_data = './'
@@ -283,11 +283,8 @@ def train(train_set, model, criterion, optimizer, epoch, args):
             k = min(k, len(out_list[j]), len(tensor_sum[j]))
             # k = min(k, len(out_list[j]), len(tensor_sum[j, 1:]))
 
-
-
-
-            out_tmp = torch.argmax(out_list[j, :k], 1).cpu().numpy()
-            tar_tmp = (tensor_sum[j, :k]).cpu().numpy()
+            out_tmp = torch.argmax(out_list[j, :k - 1], 1).cpu().numpy()
+            tar_tmp = (tensor_sum[j, 1:k]).cpu().numpy()
             #
             # output_list.append(out_tmp)
             # target_list.append(tar_tmp)
