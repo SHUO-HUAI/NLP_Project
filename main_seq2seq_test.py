@@ -42,11 +42,11 @@ parser.add_argument('--lr', '--learning-rate', default=config.lr, type=float,
 
 best_acc1 = 0.0
 
-
-dic_tmp = test_dic()
-# prepare_art_sum
-test_train(dic_tmp)
-exit()
+#
+# dic_tmp = test_dic()
+# # prepare_art_sum
+# test_train(dic_tmp)
+# exit()
 
 def data_process(args):
     os.mkdir(args.load_data)
@@ -67,19 +67,21 @@ def data_process(args):
 
 
 def data_loader(args):
+    args.load_data = './'
+    args.batch_size = 1
     dic_path = os.path.join(args.load_data, 'dictionary')
     out_path = args.load_data
 
     with open(dic_path, 'rb') as f:
         dic = pickle.load(f)
 
-    with open(os.path.join(out_path, 'train_set'), 'rb') as f:
+    with open(os.path.join(out_path, 'train'), 'rb') as f:
         padded_train = pickle.load(f)
 
-    with open(os.path.join(out_path, 'valid_set'), 'rb') as f:
+    with open(os.path.join(out_path, 'train'), 'rb') as f:
         padded_valid = pickle.load(f)
 
-    with open(os.path.join(out_path, 'test_set'), 'rb') as f:
+    with open(os.path.join(out_path, 'train'), 'rb') as f:
         padded_test = pickle.load(f)
 
     print('Train size:', len(padded_train))
@@ -260,7 +262,7 @@ def train(train_set, model, criterion, optimizer, epoch, args):
             # target_list.append(tar_tmp)
             print(out_tmp)
             print(tar_tmp)
-            input()
+            # input()
 
             loss += criterion(torch.log(out_list[j, :k]), tensor_sum[j, :k])
 
