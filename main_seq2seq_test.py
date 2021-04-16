@@ -246,7 +246,7 @@ def train(train_set, model, criterion, optimizer, epoch, args):
             k = remove_pad(tensor_sum[j, :])
             k = min(k, len(out_list[j]), len(tensor_sum[j]))
 
-            k = remove_pad(tensor_sum[j, :])
+            # k = remove_pad(tensor_sum[j, :])
             # print(out_list[j, :k].shape)
             out_tmp = torch.argmax(out_list[j, :k], 1).cpu().numpy()
             tar_tmp = (tensor_sum[j, :k]).cpu().numpy()
