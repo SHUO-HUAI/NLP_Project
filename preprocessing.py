@@ -471,7 +471,7 @@ def prepare_art_sum(path, out_path, dic):
 
             i = i + 1
             if 'train' in path:
-                if i >= 10000:
+                if i >= 20000:
                     break
             else:
                 if i >= 1000:
