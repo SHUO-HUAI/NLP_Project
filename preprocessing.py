@@ -489,7 +489,7 @@ def prepare_art_sum(path, out_path, dic):
             pickle.dump(padded_data, output, pickle.HIGHEST_PROTOCOL)
 
 
-def prepare_datas(art_name, dic):
+def prepare_data(art_name, dic):
     articles_idx = []
     summaries_idx = []
 
@@ -554,30 +554,29 @@ def prepare_datas(art_name, dic):
     padded_articles = zero_pad(articles_idx)
     padded_summaries = zero_pad(summaries_idx)
 
-
     padded_data = np.transpose(np.array([padded_articles, padded_summaries], dtype=object))
 
     return padded_data
 
 
 # Given the articles strings and a dictionary, return the arrays of words converted to indexes
-def prepare_data(articles, dic):
-    articles_idx = []
-    for article in articles:
-        article_idx = []
-        # words = article.rstrip().split()
-        art_tokens = article.split(' ')
-        tokens = [t.strip() for t in art_tokens]  # strip
-        tokens = [t for t in tokens if t != ""]  # remove empty
-        oov_idx = len(dic.idx2word)
-        for word in tokens:
-            if word in dic.word2idx.keys():
-                article_idx.append(dic.word2idx[word])
-            else:
-                article_idx.append(oov_idx)
-                oov_idx += 1
-        articles_idx.append(article_idx)
-    return articles_idx
+# def prepare_data(articles, dic):
+#     articles_idx = []
+#     for article in articles:
+#         article_idx = []
+#         # words = article.rstrip().split()
+#         art_tokens = article.split(' ')
+#         tokens = [t.strip() for t in art_tokens]  # strip
+#         tokens = [t for t in tokens if t != ""]  # remove empty
+#         oov_idx = len(dic.idx2word)
+#         for word in tokens:
+#             if word in dic.word2idx.keys():
+#                 article_idx.append(dic.word2idx[word])
+#             else:
+#                 article_idx.append(oov_idx)
+#                 oov_idx += 1
+#         articles_idx.append(article_idx)
+#     return articles_idx
 
 
 # Same as prepare_data but this is for summary so will add <SOS> at beginning and <EOS> at end
