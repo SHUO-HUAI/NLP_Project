@@ -489,6 +489,77 @@ def prepare_art_sum(path, out_path, dic):
             pickle.dump(padded_data, output, pickle.HIGHEST_PROTOCOL)
 
 
+def prepare_datas(art_name, dic):
+    articles_idx = []
+    summaries_idx = []
+
+    article, summary = get_art_abs(art_name.strip())
+
+    oov_dic = {}
+    oov_idx = len(dic.word2idx)
+
+    art_tokens = article.split(' ')
+    art_tokens = [t.strip() for t in art_tokens]  # strip
+    art_tokens = [t for t in art_tokens if t != ""]  # remove empty
+    sum_tokens = summary.split(' ')
+    # sum_tokens = [t for t in sum_tokens if
+    #               t not in [SENTENCE_START, SENTENCE_END]]  # remove these tags from vocab
+    sum_tokens = [t.strip() for t in sum_tokens]  # strip
+    sum_tokens = [t for t in sum_tokens if t != ""]  # remove empty
+
+    art_idx = []
+    sum_idx = []
+
+    art_len = 0
+    sum_len = 0
+
+    for token in art_tokens:
+
+        if token in dic.word2idx.keys():
+            art_idx.append(dic.word2idx[token])
+
+        else:
+            if token in oov_dic:
+                art_idx.append(oov_dic[token])
+
+            else:
+                art_idx.append(oov_idx)
+                oov_dic[token] = oov_idx
+                oov_idx += 1
+
+        art_len += 1
+        if art_len >= MAX_ART_LEN:
+            break
+
+    for token in sum_tokens:
+        if token in dic.word2idx.keys():
+            sum_idx.append(dic.word2idx[token])
+
+        else:
+            if token in oov_dic:
+                sum_idx.append(oov_dic[token])
+
+            else:
+                sum_idx.append(oov_idx)
+                oov_dic[token] = oov_idx
+                oov_idx += 1
+
+        sum_len += 1
+        if sum_len >= MAX_SUM_LEN:
+            break
+
+        articles_idx.append(art_idx)
+        summaries_idx.append(sum_idx)
+
+    padded_articles = zero_pad(articles_idx)
+    padded_summaries = zero_pad(summaries_idx)
+
+
+    padded_data = np.transpose(np.array([padded_articles, padded_summaries], dtype=object))
+
+    return padded_data
+
+
 # Given the articles strings and a dictionary, return the arrays of words converted to indexes
 def prepare_data(articles, dic):
     articles_idx = []
