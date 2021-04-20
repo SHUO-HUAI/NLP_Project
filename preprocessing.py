@@ -548,8 +548,8 @@ def prepare_data(art_name, dic):
         if sum_len >= MAX_SUM_LEN:
             break
 
-        articles_idx.append(art_idx)
-        summaries_idx.append(sum_idx)
+    articles_idx.append(art_idx)
+    summaries_idx.append(sum_idx)
 
     padded_articles = zero_pad(articles_idx)
     padded_summaries = zero_pad(summaries_idx)
