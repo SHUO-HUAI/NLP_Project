@@ -42,6 +42,7 @@ class Model(nn.Module):
         self.V1 = nn.Linear(hidden_dim * 3, hidden_dim * 3)
         self.V2 = nn.Linear(hidden_dim * 3, self.word_count)
 
+
     def forward(self, inputs, target=None, train=True):
 
         input_len = inputs.size(-1)  # max input sequence length
