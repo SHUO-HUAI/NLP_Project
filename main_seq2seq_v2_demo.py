@@ -55,7 +55,7 @@ def data_process(args):
     out_path = args.load_data
 
     # dic = prepare_train_art_sum(train_path, dic_path, out_path)
-    dic = prepare_dictionary(train_path, dic_path)
+    dic = prepare_dictionary(train_path, dic_path, 50)
     prepare_art_sum_demo(train_path, os.path.join(out_path, 'train_set'), dic)
     # prepare_art_sum(valid_path, os.path.join(out_path, 'valid_set'), dic)
     # prepare_art_sum(test_path, os.path.join(out_path, 'test_set'), dic)
