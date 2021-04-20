@@ -163,10 +163,10 @@ def read_files(stories_path, tokenized_path):
     return articles, summaries, dic
 
 
-def prepare_dictionary(train_path, dic_out_path):
+def prepare_dictionary(train_path, dic_out_path, max_len = None):
     dic = Dictionary()
     count_dic = CountDictionary()
-    # i = 0
+    i = 0
     # print(len(dic.word2idx))
     with open(train_path, 'r', encoding="utf8") as f:
         for art_name in f:
@@ -187,9 +187,10 @@ def prepare_dictionary(train_path, dic_out_path):
             for token in sum_tokens:
                 count_dic.add_word(token)
             #
-            # i += 1
-            # if (i == 2000):
-            #     break
+            i += 1
+            if max_len is not None:
+                if i == max_len:
+                    break
 
     # print(len(count_dic.word2count))
     # print(count_dic.word2count)
