@@ -8,6 +8,6 @@
 
 You can run the code by
 ```console
-python main.py
+python main_seq2seq_v2.py (or main_seq2seq_v2_wocov.py)
 ```
 and all training settings are in config.py
